@@ -1,5 +1,6 @@
 #include "Webserver.h"
 #include "config.h" // Include config.h for Wi-Fi credentials and other constants
+#include "wifi.h"
 #include "Useful.h"
 #include "Log.h"
 #include "DoorController.h"
@@ -13,10 +14,6 @@ ESP8266WebServer server(SERVER_PORT);
 // Extern declarations to access global variables defined in catfeeder.ino
 extern String lastScannedRfidUID;
 extern DynamicJsonDocument rfidSettingsDoc;
-
-// todo: move to settings.json
-const char* ssid = "<ssid>";
-const char* password = "<password>";
 
 const char* root_path = "/";
 
