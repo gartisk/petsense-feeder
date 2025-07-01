@@ -22,8 +22,8 @@
 // Base Configuration
 #define LED_STATUS 5        // ONBOARD LED (Usually GPIO2 on NodeMCU, connected to onboard LED)
 #define SERIAL_BEGIN 115200 // Baud rate for Serial Monitor
-#define SETTINGS_FILE "/settings.json" // File to store settings in LittleFS
-#define SETTINGS_DEFAULT_FILE "/settings_default.json" // Path to the settings file in LittleFS
+#define SETTINGS_FILE_PATH "/settings.json" // File to store settings in LittleFS
+#define SETTINGS_FILE_DEFAULT_PATH "/settings_default.json" // Path to the settings file in LittleFS
 #define SETTINGS_FILE_SIZE 1024 // Size of the settings file in bytes (adjust as needed)
 
 // Logging Configuration
@@ -43,6 +43,7 @@
 
 #define DOOR_OPEN_ANGLE 180 // Example: Servo angle when the door is fully open.
 #define DOOR_CLOSED_ANGLE 0 // Example: Servo angle when the door is fully closed.
+#define DOOR_DELAYER_DIVISOR 1000 // Example: Divisor for the delay between servo movements (in milliseconds).
 
 // WEB SERVER
 #define SERVER_PORT 80

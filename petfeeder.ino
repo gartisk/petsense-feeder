@@ -12,7 +12,7 @@
 #include "Webserver.h" // Handles all web server functionalities
 #include "RFIDManager.h"
 #include "DoorController.h"
-#include "FileManager.h" // Include LittleFS for file system operations
+#include "SettingsManager.h" // Include LittleFS for file system operations
 
 // Global variables that are shared across different modules
 // These are defined here and extern'd in other .cpp files that need to access them.
@@ -28,8 +28,8 @@ void setup() {
   ledStatus(5, 100);
 
   // Initialize LittleFS filesystem
-  LOG_INFO("File System - Initializing");
-  FileManager::begin(); 
+  LOG_INFO("Settings Manager - Initializing");
+  SettingsManager::begin(); 
 
   // Initialize the RFID module
   LOG_INFO("RFID Module - Initializing");

@@ -2,14 +2,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Element Selectors ---
 
 
-    
+
     const dispenserScheduleList = document.getElementById('dispenser-schedule-list');
 
     const timeIntervalsContainer = document.getElementById('time-intervals-container');
     const rfidRequiredCheckbox = document.getElementById('rfid-required-checkbox');
 
-    
-    
+
+
     const newRfidIdInput = document.getElementById('new-rfid-id');
     const newOwnerNameInput = document.getElementById('new-owner-name');
 
@@ -62,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error loading settings:', error);
         }
     }
-
 
 
     // --- Load Door Status ---
@@ -337,6 +336,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Test Settings ---
+    const testSettingsBtn = document.getElementById('test-settings-btn');
+    testSettingsBtn.addEventListener('click', () => {
+        const settings = {
+            "DOOR_OPEN_ANGLE": doorMaxOpeningInput.value,
+            "DOOR_CLOSE_ANGLE": doorMaxClosingInput.value,
+            "DOOR_OPEN_SPEED": doorOpeningSpeedInput.value,
+            "DOOR_CLOSE_SPEED": doorClosingSpeedInput.value,
+            "DOOR_CLOSE_WAIT": delayToCloseInput.value
+
+        };
+
+        console.log('Testing settings:', settings);
+        fetch('/api/settings', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(settings)
+
+        }).then(response => {
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+        })
+            .then(data => {
+                console.log('Server response:', data);
+                hideSaveWarning(); // Hide warning on successful test
+            })
+            .catch(error => {
+                console.error('Error testing settings:', error);
+                alert(`Failed to test settings: ${error.message}.`);
+            });
+    });
 
     // --- Save Settings ---
     saveSettingsBtn.addEventListener('click', () => {

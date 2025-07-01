@@ -198,34 +198,27 @@ void handleSettingsRead() {
 }
 
 
-// void handleSettingsUpdate() {
-//   if (!server.hasArg("plain")) {
-//     server.send(400, "application/json", "{\"status\":\"error\", \"message\":\"No data received\"}");
-//     return;
-//   }
+void handleSettingsUpdate() {
+  if (!server.hasArg("plain")) {
+    server.send(400, "application/json", "{\"status\":\"error\", \"message\":\"No data received\"}");
+    return;
+  }
 
-//   String body = server.arg("plain");
-//   Serial.println("Received PATCH request body for settings update:");
-//   LOG_INFO(body);
+  String body = server.arg("plain");
+  Serial.println("Received POST request body for settings update:");
+  Serial.println(body);
 
-//   StaticJsonDocument<SETTINGS_FILE_SIZE> doc;
-//   DeserializationError error = deserializeJson(doc, body);
-  
-//   if (error) {
-//     Serial.print(F("deserializeJson() failed: "));
-//     Serial.println(error.f_str());
-//     server.send(400, "application/json", "{\"status\":\"error\", \"message\":\"Invalid JSON\"}");
-//     return;
-//   }
+  StaticJsonDocument<SETTINGS_FILE_SIZE> doc;
+  DeserializationError error = deserializeJson(doc, body);
+  JsonObject obj = doc.as<JsonObject>();
 
-//   JsonObject obj = doc.as<JsonObject>();
-//   if (!SettingsManager::patch(obj)) {
-//     server.send(500, "application/json", "{\"status\":\"error\", \"message\":\"Failed to update settings\"}");
-//     return;
-//   }
+  if (!SettingsManager::set(obj)) {
+    server.send(500, "application/json", "{\"status\":\"error\", \"message\":\"Failed to update settings\"}");
+    return;
+  } 
 
-//   server.send(200, "application/json", "{\"status\":\"success\", \"message\":\"Settings updated\"}");
-// }
+  server.send(200, "application/json", "{\"status\":\"success\", \"message\":\"Settings updated\"}");
+}
 
 void handleSettingsSave() {
   if (!server.hasArg("plain")) {
@@ -241,7 +234,7 @@ void handleSettingsSave() {
   DeserializationError error = deserializeJson(doc, body);
   JsonObject obj = doc.as<JsonObject>();
 
-  if (!SettingsManager::update(obj)) {
+  if (!SettingsManager::set(obj) && SettingsManager::save() ) {
     server.send(500, "application/json", "{\"status\":\"error\", \"message\":\"Failed to save settings\"}");
     return;
   } 
@@ -282,7 +275,7 @@ void setup_webserver () {
   server.on("/api/settings", HTTP_GET, handleSettingsRead);
   server.on("/api/last_rfids", HTTP_GET, handleLastRFIDs);
 
-  // server.on("/api/settings", HTTP_PUT, handleSettingsUpdate);
+  server.on("/api/settings", HTTP_PUT, handleSettingsUpdate);
   server.on("/api/save_settings", HTTP_POST, handleSaveSettings);
 
   // Set up a generic handler for any unmapped file requests (e.g., /style.css)

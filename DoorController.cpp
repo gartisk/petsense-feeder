@@ -2,6 +2,7 @@
 #include "DoorController.h" // Include the custom header file
 #include "Useful.h"           // Include the useful functions header for logging
 #include "Log.h"
+#include "SettingsManager.h" // Include the settings manager for configuration
 
 static Servo door_servo;
 static DoorState door_state = DOOR_CLOSED;
@@ -11,33 +12,83 @@ static const unsigned long debounceDelay = 200; // ms
 // begin() method implementation
 // This function sets up the hardware connections and initial state.
 void door_begin() {
-    door_servo.attach(DOOR_PIN);
-    door_servo.write(DOOR_CLOSED_ANGLE);
-    pinMode(DOOR_BTN_PIN, INPUT_PULLUP);
-    door_state = DOOR_CLOSED;
+    door_servo.attach(DOOR_PIN, 500, 2400);
+    pinMode(DOOR_BTN_PIN, INPUT_PULLUP); // Set button pin as input
+    
+    door_close(); // Initialize the door to the closed position
     lastButtonPressTime = 0;
 
-    Serial.println("DoorController initialized.");
-    Serial.print("Servo Pin: "); Serial.println(DOOR_PIN);
-    Serial.print("Button Pin: "); Serial.println(DOOR_BTN_PIN);
-    Serial.print("Open Angle: "); Serial.println(DOOR_OPEN_ANGLE);
-    Serial.print("Close Angle: "); Serial.println(DOOR_CLOSED_ANGLE);
+    LOG_INFO("DoorController initialized.");
+    LOG_INFO("Servo Pin: " + String(DOOR_PIN));
+    LOG_INFO("Button Pin: " + String(DOOR_BTN_PIN));
+    LOG_INFO("Open Angle: " + String(DOOR_OPEN_ANGLE));
+    LOG_INFO("Close Angle: " + String(DOOR_CLOSED_ANGLE));
 }
+
+// void servo_move_to_angle(int angle, int speed) {
+//     int currentAngle = door_servo.read();
+//     if (currentAngle == angle) return;
+
+//     int step = (angle > currentAngle) ? 1 : -1;
+//     int delayPerStep = speed > 0 ? speed : 10; // fallback to 10ms if speed is 0
+
+//     for (int pos = currentAngle; pos != angle; pos += step) {
+//         door_servo.write(pos);
+//         delay(delayPerStep);
+//     }
+//     door_servo.write(angle);
+// }
+
+void servo_move_to_angle(int angle, int speed) {
+    int currentAngle = door_servo.read();
+    
+    if (currentAngle == angle) return;
+
+    int step = ((angle > currentAngle) ? 1 : -1)*10;
+
+    int delayResult = DOOR_DELAYER_DIVISOR / speed;
+
+    if( currentAngle < angle ){
+        // open
+        for (int pos = currentAngle; pos <= angle; pos += step) {
+            door_servo.write(pos);
+            delay(delayResult);
+        }
+    } else {
+        //close
+        for (int pos = currentAngle; pos >= angle; pos += step) {
+            door_servo.write(pos);
+            delay(delayResult);
+        }
+    }
+
+
+    door_servo.write(angle);
+}
+
 
 // openDoor() method implementation
 // Moves the servo to the angle defined as the "open" position.
 void door_open() {
-    door_servo.write(DOOR_OPEN_ANGLE);
+    int openAngle = SettingsManager::cached_settings["DOOR_OPEN_ANGLE"].as<int>();
+    int openSpeed = SettingsManager::cached_settings["DOOR_OPEN_SPEED"].as<int>();
+
+    servo_move_to_angle(openAngle, openSpeed);    
     door_state = DOOR_OPEN;
-    Serial.println("Door opened.");
+
+    LOG_INFO("Door opened. " + String(openAngle) + " degrees." + String(openSpeed) + " ms.");
 }
 
 // closeDoor() method implementation
 // Moves the servo to the angle defined as the "closed" position.
 void door_close() {
-    door_servo.write(DOOR_CLOSED_ANGLE);
+    int closeAngle = SettingsManager::cached_settings["DOOR_CLOSE_ANGLE"].as<int>();
+    int closeSpeed = SettingsManager::cached_settings["DOOR_CLOSE_SPEED"].as<int>();
+    
+    servo_move_to_angle(closeAngle, closeSpeed);
     door_state = DOOR_CLOSED;
-    Serial.println("Door closed.");
+
+    LOG_INFO("Door closed. " + String(closeAngle) + " degrees." + String(closeSpeed) + " ms.");
 }
 
 static bool isDebounced() {
