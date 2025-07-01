@@ -1,0 +1,24 @@
+{
+    "LANGUAGE": "en",
+    "WIFI": {
+        "SSID": "your_wifi_ssid",
+        "PASSWORD": "your_wifi_password"
+    },
+    "DOOR_OPEN_ANGLE": 100,
+    "DOOR_CLOSE_ANGLE": 0,
+    "DOOR_OPEN_SPEED": 100,
+    "DOOR_CLOSE_SPEED": 100,
+    "DOOR_CLOSE_WAIT": 15000,
+    "RFID_LIST": [
+        {
+            "ID": "1234567890",
+            "NAME": "Pet 1",
+            "ALLOWED": true
+        },
+        {
+            "ID": "0987654321",
+            "NAME": "Pet 2",
+            "ALLOWED": false
+        }
+    ]
+}

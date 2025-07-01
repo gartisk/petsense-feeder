@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Feeder Control</title>
+    <!-- Daisy UI CSS CDN (includes Tailwind CSS) -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for log areas */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="bg-base-200" data-theme="cupcake">
+    <!-- Loader (hidden by default) -->
+    <div id="loader" class="mt-4 hidden flex items-center justify-center">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+        <p class="text-sm text-base-content ml-2">Loading...</p>
+    </div>
+
+    <div class="navbar bg-base-100 shadow-lg">
+        <div class="navbar-start">
+            <h1 class="text-2xl font-bold text-primary">Pet Feeder Control</h1>
+        </div>
+        <div class="navbar-end">
+            <select id="languageSwitcher" class="select select-bordered select-sm">
+                <option value="pt">🇧🇷 PT</option>
+                <option value="en">🇺🇸 EN</option>
+                <option value="es">🇪🇸 ES</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="container mx-auto p-4 max-w-4xl">
+        <!-- Main Container -->
+        <div class="bg-base-100 p-8 rounded-lg shadow-xl">
+            
+            <!-- <h1 class="text-3xl font-bold text-center mb-6">Pet Feeder Settings</h1> -->
+            
+            <!-- Save Warning Message -->
+            <div id="save-warning" class="hidden mb-6 alert alert-warning">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" /></svg>
+                <span>Settings have been changed. Click "Save All Settings" to persist them.</span>
+            </div>
+
+            <!-- Door Control Panel -->
+            <div class="mb-8 card bg-base-100 shadow-md">
+                <div class="card-body text-center">
+                    <h2 class="card-title justify-center text-primary mb-4">Door Control</h2>
+                    <button id="doorToggleButton"
+                            class="btn btn-circle btn-lg mx-auto mb-4
+                                 btn-neutral">
+                        <!-- SVG Icon will be inserted here by JavaScript -->
+                    </button>
+                    
+                    <p id="doorStatusMessage" class="text-base-content/70 mb-4"></p>
+                    <div>
+                        <button id="refresh-door-btn" class="btn btn-outline btn-sm">Refresh</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Door Configuration -->
+            <div class="mb-8 card bg-warning/10 border border-warning/20">
+                <div class="card-body">
+                    <h2 class="card-title text-warning mb-4">Door Configuration</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="form-control">
+                            <label class="label" for="door-max-opening">
+                                <span class="label-text">Door Max Opening (mm)</span>
+                            </label>
+                            <input type="number" id="door-max-opening" name="door-max-opening"
+                                class="input input-bordered input-warning w-full"
+                                value="100">
+                        </div>
+                        <div class="form-control">
+                            <label class="label" for="door-opening-speed">
+                                <span class="label-text">Door Opening Speed (%)</span>
+                            </label>
+                            <input type="number" id="door-opening-speed" name="door-opening-speed" min="1" max="100"
+                                class="input input-bordered input-warning w-full"
+                                value="80">
+                        </div>
+                        <div class="form-control">
+                            <label class="label" for="door-max-closing">
+                                <span class="label-text">Door Max Closing (mm)</span>
+                            </label>
+                            <input type="number" id="door-max-closing" name="door-max-closing"
+                                class="input input-bordered input-warning w-full"
+                                value="100">
+                        </div>
+                        <div class="form-control">
+                            <label class="label" for="door-closing-speed">
+                                <span class="label-text">Door Closing Speed (%)</span>
+                            </label>
+                            <input type="number" id="door-closing-speed" name="door-closing-speed" min="1" max="100"
+                                class="input input-bordered input-warning w-full"
+                                value="50">
+                        </div>
+                        <div class="form-control">
+                            <label class="label" for="delay-to-close">
+                                <span class="label-text">Delay to Close (seconds)</span>
+                            </label>
+                            <input type="number" id="delay-to-close" name="delay-to-close" min="0"
+                                class="input input-bordered input-warning w-full"
+                                value="50">
+                        </div>
+                    </div>
+
+                    <!-- Collapsible Helper -->
+                    <div class="collapse collapse-arrow bg-warning/5 border border-warning/10 mt-4">
+                        <input type="checkbox" class="peer" />
+                        <div class="collapse-title text-sm font-medium text-warning">
+                            How Door Configuration Works
+                        </div>
+                        <div class="collapse-content text-xs text-base-content/70">
+                            <p class="mb-1"><strong>Door Max Opening (mm):</strong> Sets the maximum distance the door can open from its closed position.</p>
+                            <p class="mb-1"><strong>Door Opening Speed (%):</strong> Controls how fast the door opens (1-100%, higher is faster).</p>
+                            <p class="mb-1"><strong>Door Max Closing (mm):</strong> Sets the maximum distance the door can close from its fully open position.</p>
+                            <p class="mb-1"><strong>Door Closing Speed (%):</strong> Controls how fast the door closes (1-100%, higher is faster).</p>
+                            <p><strong>Delay to Close (seconds):</strong> Specifies the time, in seconds, before the door automatically begins to close after being opened. Set to 0 for no auto-close.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Allowed RFID List -->
+            <div class="mb-8 card bg-success/10 border border-success/20">
+                <div class="card-body">
+                    <h2 class="card-title text-success mb-4">RFID Tags</h2>
+                    <div id="rfid-list-container" class="space-y-4">
+                    </div>
+                    <div class="mt-6 p-4 bg-base-200 rounded-lg">
+                        <h3 class="text-lg font-semibold text-base-content mb-4">Add New RFID</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div class="form-control">
+                                <label class="label" for="new-rfid-id">
+                                    <span class="label-text">RFID ID</span>
+                                </label>
+                                <input type="text" id="new-rfid-id" placeholder="Enter RFID ID" 
+                                    class="input input-bordered input-success w-full">
+                            </div>
+                            <div class="form-control">
+                                <label class="label" for="new-owner-name">
+                                    <span class="label-text">Owner Name</span>
+                                </label>
+                                <input type="text" id="new-owner-name" placeholder="Enter owner name" 
+                                    class="input input-bordered input-success w-full">
+                            </div>
+                            <div class="form-control flex flex-row items-center mt-6 md:mt-0">
+                                <label class="label cursor-pointer" for="new-rfid-allowed">
+                                    <span class="label-text mr-2">Allowed</span>
+                                    <input type="checkbox" id="new-rfid-allowed" class="toggle toggle-success" checked>
+                                </label>
+                            </div>
+                        </div>
+                        <button id="add-rfid-btn" class="btn btn-success w-full">Add RFID</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time RFID Log -->
+            <div class="mb-8 card bg-primary/10 border border-primary/20">
+                <div class="card-body">
+                    <h2 class="card-title text-primary mb-4">Scanned RFIDs</h2>
+                    <div id="last-rfid-list-container" class="space-y-4">
+                    </div>
+                    <div>
+                        <button id="refresh-rfid-btn" class="btn btn-ghost btn-sm mt-2">Refresh</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Log -->
+            <div class="mb-8 card bg-base-200 border border-base-300">
+                <div class="card-body">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="card-title text-base-content">System Log</h2>
+                        <button id="toggle-log-btn" class="btn btn-outline btn-sm">View Logs</button>
+                    </div>
+                    <div id="log-container" class="hidden">
+                        <textarea id="log-content" readonly class="textarea textarea-bordered w-full h-48 bg-neutral text-neutral-content font-mono text-sm resize-none"></textarea>
+                        <button id="refresh-log-btn" class="btn btn-ghost btn-sm mt-2">Refresh</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save Settings Button -->
+            <div class="mt-8">
+                <button id="test-changes-btn" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-md shadow-lg transition duration-300 ease-in-out transform hover:scale-105 mb-4">Test Changes</button>
+                <button id="save-settings-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-md shadow-lg transition duration-300 ease-in-out transform hover:scale-105">Save All Settings</button>
+            </div>
+        </div>
+    <div>
+    <script src="script.js"></script>
+</body>
+</html>
