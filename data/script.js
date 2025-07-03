@@ -340,11 +340,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const testSettingsBtn = document.getElementById('test-settings-btn');
     testSettingsBtn.addEventListener('click', () => {
         const settings = {
-            "DOOR_OPEN_ANGLE": doorMaxOpeningInput.value,
-            "DOOR_CLOSE_ANGLE": doorMaxClosingInput.value,
-            "DOOR_OPEN_SPEED": doorOpeningSpeedInput.value,
-            "DOOR_CLOSE_SPEED": doorClosingSpeedInput.value,
-            "DOOR_CLOSE_WAIT": delayToCloseInput.value
+            DOOR_OPEN_ANGLE: doorMaxOpeningInput.value,
+            DOOR_CLOSE_ANGLE: doorMaxClosingInput.value,
+            DOOR_OPEN_SPEED: doorOpeningSpeedInput.value,
+            DOOR_CLOSE_SPEED: doorClosingSpeedInput.value,
+            DOOR_CLOSE_WAIT: delayToCloseInput.value
 
         };
 
@@ -370,62 +370,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Save Settings ---
     saveSettingsBtn.addEventListener('click', () => {
-        const dispenserSchedules = [];
-        dispenserScheduleList.querySelectorAll('.flex').forEach(item => {
-            const time = item.querySelector('div span:nth-child(1)').textContent;
-            const amount = item.querySelector('div span:nth-child(2)').textContent.replace(' grams', '');
-            dispenserSchedules.push({ time, amount });
-        });
-
-        const doorTimeIntervals = [];
-        timeIntervalsContainer.querySelectorAll('.grid').forEach(div => {
-            const openTime = div.querySelector('input[name="door-ini"]').value;
-            const closeTime = div.querySelector('input[name="door-end"]').value;
-            if (openTime && closeTime) {
-                doorTimeIntervals.push({ open: openTime, close: closeTime });
-            }
-        });
-
-        const rfidEntries = [];
-        rfidListContainer.querySelectorAll('.flex').forEach(item => {
-            const rfidId = item.querySelector('p:nth-child(1) span').textContent;
-            const ownerName = item.querySelector('p:nth-child(2) span').textContent;
-            rfidEntries.push({ id: rfidId, owner: ownerName });
-        });
+        // const rfidEntries = [];
+        // rfidListContainer.querySelectorAll('.flex').forEach(item => {
+        //     const rfidId = item.querySelector('p:nth-child(1) span').textContent;
+        //     const ownerName = item.querySelector('p:nth-child(2) span').textContent;
+        //     rfidEntries.push({ id: rfidId, owner: ownerName });
+        // });
 
         const settings = {
-            door_config: {
-                max_opening: doorMaxOpeningInput.value,
-                opening_speed: doorOpeningSpeedInput.value,
-                max_closing: doorMaxClosingInput.value,
-                closing_speed: doorClosingSpeedInput.value
-            },
-            food_dispenser_schedules: dispenserSchedules,
-            door_time_intervals: doorTimeIntervals,
-            rfid_required: rfidRequiredCheckbox.checked,
-            allowed_rfids: rfidEntries
+            DOOR_OPEN_ANGLE: doorMaxOpeningInput.value,
+            DOOR_CLOSE_ANGLE: doorMaxClosingInput.value,
+            DOOR_OPEN_SPEED: doorOpeningSpeedInput.value,
+            DOOR_CLOSE_SPEED: doorClosingSpeedInput.value,
+            DOOR_CLOSE_WAIT: delayToCloseInput.value
         };
 
         console.log('Settings to save:', settings);
 
-        fetch('/save_settings', {
+        fetch('/api/settings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(settings)
         })
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return response.json();
-            })
-            .then(data => {
-                console.log('Server response:', data);
-                hideSaveWarning(); // Hide warning on successful save
-                alert('Settings saved successfully!');
-            })
-            .catch(error => {
-                console.error('Error saving settings:', error);
-                alert(`Failed to save settings: ${error.message}.`);
-            });
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Server response:', data);
+            hideSaveWarning(); // Hide warning on successful save
+            alert('Settings saved successfully!');
+        })
+        .catch(error => {
+            console.error('Error saving settings:', error);
+            alert(`Failed to save settings: ${error.message}.`);
+        });
     });
 
 });

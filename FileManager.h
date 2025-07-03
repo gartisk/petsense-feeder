@@ -20,16 +20,6 @@ public:
         LOG_DEBUG("FileManager", __FUNCTION__, "LittleFS unmounted.");
     }
 
-    static bool createFile(const char* path, const char* content) {
-        File file = LittleFS.open(path, "w");
-        if (!file) {
-            return false;
-        }
-        
-        file.print(content);
-        file.close();
-        return true;
-    }
 
     static File open(const char* path, const char* mode) {
         File file = LittleFS.open(path, mode);
@@ -49,10 +39,22 @@ public:
         return content;
     }
 
-    static bool updateFile(const char* path, const char* newContent) {
-        return createFile(path, newContent); // Overwrite the file
-    }
+    static bool saveFile(const char* path, const char* content) {
+        File file = LittleFS.open(path, "w");
 
+        LOG_INFO(String(content).c_str());
+
+        if (!file) {
+            return false;
+        }
+        
+        file.print(content);
+        LOG_DEBUG("FileManager", __FUNCTION__, ("File created/update: " + String(path)).c_str() );
+
+        file.close();
+        return true;
+    }
+    
     static bool deleteFile(const char* path) {
         return LittleFS.remove(path);
     }

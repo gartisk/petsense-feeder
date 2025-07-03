@@ -1,5 +1,7 @@
-#include "Webserver.h"
+
+#include <ESP8266WebServer.h>
 #include "config.h" // Include config.h for Wi-Fi credentials and other constants
+#include "Webserver.h"
 #include "wifi.h"
 #include "Useful.h"
 #include "Log.h"
@@ -111,42 +113,25 @@ void handleRoot() {
 // Handles POST requests to "/save_settings" to update feeder settings.
 // Parses JSON payload from the web page.
 void handleSaveSettings() {
-  if (server.hasArg("plain")) {
-    String body = server.arg("plain");
-    Serial.println("Received POST request body:");
-    Serial.println(body);
-
-    StaticJsonDocument<1024> doc; // Adjust size as needed for your JSON payload
-    DeserializationError error = deserializeJson(doc, body);
-
-    if (error) {
-      Serial.print(F("deserializeJson() failed: "));
-      Serial.println(error.f_str());
-      server.send(400, "application/json", "{\"status\":\"error\", \"message\":\"Invalid JSON\"}");
-      return;
-    }
-
-    // Update global settings variables (for demonstration; in real app, save to LittleFS/EEPROM)
-    // currentDoorOpenTime = doc["door_open_time"].as<String>();
-    // currentDoorCloseTime = doc["door_close_time"].as<String>();
-    JsonArray allowedRfids = doc["allowed_rfids"].as<JsonArray>();
-
-    Serial.print("Door Open Time: ");
-    // Serial.println(currentDoorOpenTime);
-    Serial.print("Door Close Time: ");
-    // Serial.println(currentDoorCloseTime);
-    Serial.println("Allowed RFIDs:");
-    for (JsonObject rfid : allowedRfids) {
-      Serial.print("  ID: ");
-      Serial.print(rfid["id"].as<String>());
-      Serial.print(", Owner: ");
-      Serial.println(rfid["owner"].as<String>());
-    }
-
-    server.send(200, "application/json", "{\"status\":\"success\", \"message\":\"Settings received\"}");
-  } else {
+  if (!server.hasArg("plain")) {
     server.send(400, "application/json", "{\"status\":\"error\", \"message\":\"No data received\"}");
+    return;
   }
+
+  String body = server.arg("plain");
+  Serial.println("Received POST request body for settings save:");
+  Serial.println(body);
+
+  StaticJsonDocument<SETTINGS_FILE_SIZE> doc;
+  DeserializationError error = deserializeJson(doc, body);
+  JsonObject obj = doc.as<JsonObject>();
+
+  if (!SettingsManager::set(obj) || !SettingsManager::save()) {
+    server.send(500, "application/json", "{\"status\":\"error\", \"message\":\"Failed to save settings\"}");
+    return;
+  } 
+
+  server.send(200, "application/json", "{\"status\":\"success\", \"message\":\"Settings saved\"}");
 }
 
 // Handles GET requests to "/rfid_status" to provide real-time RFID data to the web page.
@@ -168,18 +153,18 @@ void handleLastRFIDs() {
 void handleToggleDoor() {
   LOG_INFO("Toggle Door Request Received");
   
-  if (door_get_state() == DOOR_CLOSED) {
-    door_open(); // Close the door if it's currently open
+  if (DoorController::get_state() == DOOR_CLOSED) {
+    DoorController::open(); // Open the door if it's currently closed
     server.send(200, "application/json", "{\"status\":\"success\", \"message\":\"Opening the Door\", \"door_state\": \"open\"}");
     return;
   }
 
-  door_close(); // Close the door if it's currently open
+  DoorController::close(); // Close the door if it's currently open
   server.send(200, "application/json", "{\"status\":\"success\", \"message\":\"Closing the Door\", \"door_state\": \"closed\"}");
 }
 
 void handleDoorState() {
-  String state = (door_get_state() == DOOR_OPEN) ? "open" : "closed";
+  String state = (DoorController::get_state() == DOOR_OPEN) ? "open" : "closed";
   server.send(200, "application/json", "{\"door_state\":\"" + state + "\"}");
 }
 
@@ -234,12 +219,12 @@ void handleSettingsSave() {
   DeserializationError error = deserializeJson(doc, body);
   JsonObject obj = doc.as<JsonObject>();
 
-  if (!SettingsManager::set(obj) && SettingsManager::save() ) {
-    server.send(500, "application/json", "{\"status\":\"error\", \"message\":\"Failed to save settings\"}");
-    return;
+  if (SettingsManager::set(obj) && SettingsManager::save() ) {
+    server.send(200, "application/json", "{\"status\":\"success\", \"message\":\"Settings saved\"}");
   } 
-
-  server.send(200, "application/json", "{\"status\":\"success\", \"message\":\"Settings saved\"}");
+  
+  server.send(500, "application/json", "{\"status\":\"error\", \"message\":\"Failed to save settings\"}");
+  return;
 }
 
 // Handles GET requests to "/logs" to provide the log buffer content.
@@ -272,11 +257,11 @@ void setup_webserver () {
   server.on("/api/logs", HTTP_GET, handleLogs);
   server.on("/api/toggle_door", HTTP_POST, handleToggleDoor);
   server.on("/api/door_state", HTTP_GET, handleDoorState);
-  server.on("/api/settings", HTTP_GET, handleSettingsRead);
   server.on("/api/last_rfids", HTTP_GET, handleLastRFIDs);
-
+  
+  server.on("/api/settings", HTTP_GET, handleSettingsRead);
   server.on("/api/settings", HTTP_PUT, handleSettingsUpdate);
-  server.on("/api/save_settings", HTTP_POST, handleSaveSettings);
+  server.on("/api/settings", HTTP_POST, handleSettingsSave);
 
   // Set up a generic handler for any unmapped file requests (e.g., /style.css)
   server.onNotFound([]() {

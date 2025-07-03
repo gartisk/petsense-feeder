@@ -3,6 +3,7 @@
 
 #include <ArduinoJson.h>
 #include "config.h"
+#include "Log.h"
 #include "FileManager.h"
 
 class SettingsManager {
@@ -56,17 +57,16 @@ public:
         return true;
     }
 
+
     // save
     static bool save() {
-        File file = FileManager::open(SETTINGS_FILE_PATH, "w");
-        if (!file) {
-            LOG_ERROR("SettingsManager", __FUNCTION__, "Failed to open settings file for writing.");
-            return false;
-        }
+        // convert StaticJsonDocument to Char array
+        char jsonString[SETTINGS_FILE_SIZE];
+        serializeJson(cached_settings, jsonString);
 
-        serializeJson(cached_settings, file);
-        file.close();
-
+        LOG_INFO(String(jsonString));
+        
+        FileManager::saveFile(SETTINGS_FILE_PATH, jsonString);
         LOG_INFO("Settings saved successfully.");
         return true;
     }

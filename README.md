@@ -41,7 +41,7 @@ mv arduino-littlefs-upload-1.5.4.vsix ~/.arduino15/plugins/
 
 ## 🖼️ App Demo
 
-![Petsense Feeder Web Interface Demo](demo.png)
+![Petsense Feeder Web Interface Demo](docs/demo.png)
 
 *Screenshot of the Petsense Feeder web interface, showing the dashboard for servo configuration, RFID tag registration, and system logs, accessible via WiFi from any device.*
 

@@ -15,21 +15,3 @@ bool ledStatus ( int blinkingTimes, int ledDelay) {
 
   return false;
 }
-
-// void logMessage(const char* message) {
-//     Serial.println(message);
-// }
-
-// void logMessage(const String& message) {
-//     Serial.println(message.c_str());
-// }
-
-// void logError(const char* message) {
-//     Serial.print("ERROR: ");
-//     Serial.println(message);
-// }
-
-// void logError(const String& message) {
-//     Serial.print("ERROR: ");
-//     Serial.println(message.c_str());
-// }
