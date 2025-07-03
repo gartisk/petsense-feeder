@@ -14,13 +14,12 @@
 ESP8266WebServer server(SERVER_PORT);
 
 // Extern declarations to access global variables defined in catfeeder.ino
+// todo remove
 extern String lastScannedRfidUID;
-extern DynamicJsonDocument rfidSettingsDoc;
 
 const char* root_path = "/";
 
 
-// --- FILE SYSTEM (LittleFS) FUNCTIONS ---
 // Determines the content type of a file based on its extension.
 String getContentType(String filename) {
   // @TODO refine this function to use a map or array for better performance and maintainability.
@@ -53,17 +52,14 @@ String getContentType(String filename) {
     return "application/x-gzip";
   }
 
-  
   return "text/plain";
 }
 
-// Handles requests for static files from LittleFS.
-// Prepends "/data" to the path because files are typically stored there by the uploader.
+// Handles requests for static files 
 bool handleFileRequest(String path) {
   
-  Serial.print("Handling file: ");
+  LOG_DEBUG("Webserver", __FUNCTION__, "Requested path: " + path);
 
-  Serial.println(path);
   if (path.endsWith("/")) {
     path += SERVER_PAGE_MAIN; // Default to index.html for root or directory requests
   }
@@ -71,15 +67,18 @@ bool handleFileRequest(String path) {
   String contentType = getContentType(path);
   String pathWithData = root_path + path; // LittleFS files are mounted under /
 
-  if (FileManager::fileExists(pathWithData.c_str())) {
-    File file = FileManager::open(pathWithData.c_str(), "r");
-    if (file) {
-      server.streamFile(file, contentType); // Efficiently stream the file content
-      file.close();
-      return true;
-    }
+  if ( !FileManager::fileExists(pathWithData.c_str())) {
+    return false;
   }
-  return false;
+
+  File file = FileManager::open(pathWithData.c_str(), "r");
+  if (!file) {
+    return false;
+  }
+
+  server.streamFile(file, contentType); // Efficiently stream the file content
+  file.close();
+  return true;
 }
 
 

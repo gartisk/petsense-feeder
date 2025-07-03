@@ -20,8 +20,11 @@
 // +------+--------+-------------+-------------+-------------------------------------------------------------+
 
 // Base Configuration
-#define LED_STATUS 5        // ONBOARD LED (Usually GPIO2 on NodeMCU, connected to onboard LED)
 #define SERIAL_BEGIN 115200 // Baud rate for Serial Monitor
+
+#define LED_STATUS 5        // ONBOARD LED (Usually GPIO2 on NodeMCU, connected to onboard LED)
+#define LED_ERROR 16
+
 #define SETTINGS_FILE_PATH "/settings.json" // File to store settings in LittleFS
 #define SETTINGS_FILE_DEFAULT_PATH "/settings_default.json" // Path to the settings file in LittleFS
 #define SETTINGS_FILE_SIZE 1024 // Size of the settings file in bytes (adjust as needed)
@@ -40,6 +43,7 @@
 // Servo Module Configuration
 #define DOOR_PIN 0        // Connect the servo's signal wire (usually yellow/orange) to this pin.
 #define DOOR_BTN_PIN 4 // Connect one leg of your push button to this pin.
+#define DOOR_DEBOUNCE_DELAY 50 // Debounce delay for the button in milliseconds.
 
 #define DOOR_OPEN_ANGLE 180 // Example: Servo angle when the door is fully open.
 #define DOOR_CLOSED_ANGLE 0 // Example: Servo angle when the door is fully closed.

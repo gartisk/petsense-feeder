@@ -45,7 +45,7 @@ void setup_rfid_module() {
 
     if (version == 0x00 || version == 0xFF) {
         LOG_ERROR( "setup_rfid_module", __FUNCTION__, "MFRC522 not found! Check wiring and power.");
-        ledStatus(3, 500); // Indicate error with LED
+        ledError(2, 100); // Indicate error with LED
         return; // Halt setup if MFRC522 is not found
     } 
 

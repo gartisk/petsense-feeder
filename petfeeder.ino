@@ -1,24 +1,14 @@
-/*
- * Project: Pet Feeder - RFID-Authorized Access
- * Author: Guilherme Araujo aka Gartisk
- * Date: 24/06/2025
- * Version: 1.0.0
- * 
- */
-
-#include "config.h" // Ensure this includes the LED_STATUS definition
-#include "SettingsManager.h" // Include LittleFS for file system operations
-#include "Useful.h"
+#include "config.h" 
+#include "SettingsManager.h"
 #include "Log.h"
+#include "Useful.h"
+
 #include "Webserver.h" // Handles all web server functionalities
 #include "RFIDManager.h"
 #include "DoorController.h"
 
-// Global variables that are shared across different modules
-// These are defined here and extern'd in other .cpp files that need to access them.
 String lastScannedRfidUID = "No scan yet"; // Stores the last scanned RFID UID for web display
 
-DynamicJsonDocument rfidSettingsDoc(1024); // For parsing and holding RFID settings from web requests
 
 void setup() {
   Serial.begin(SERIAL_BEGIN); // Initialize serial communication
@@ -28,8 +18,13 @@ void setup() {
   LOG_INFO("Settings Manager - Initializing");
   SettingsManager::begin(); 
 
+  // Initialize LEDs
+  LOG_INFO("LEDs - Initializing");
+  pinMode(LED_STATUS, OUTPUT);
+  // pinMode(LED_ERROR, OUTPUT);
+
   // Initialize the LED status
-  ledStatus(5, 100);
+  ledStatus(5, 50);
 
   // Initialize the RFID module
   LOG_INFO("RFID Module - Initializing");
@@ -44,19 +39,32 @@ void setup() {
   DoorController::begin();
 }
 
-
-void loop() {
-
+void scan_id(){
   // Continuously scan for RFID tags
   String rfidUid = scan_rfid_card(); // Scan for RFID card and get UID
 
-  if (rfidUid.length() > 0 && isAllowedRFID(rfidUid) ) { 
-    DoorController::open_close();                // If a valid RFID UID is scanned, open the door
+  // nothing scanned
+  if ( rfidUid.length() < 1 ) {
+    return;
   }
+
+  if ( !isAllowedRFID(rfidUid) ) { 
+    ledError(5, 200); // Indicate error with LED
+    LOG_ERROR("RFIDManager", __FUNCTION__, "RFID not allowed: " + rfidUid);
+    
+    lastScannedRfidUID = "Not allowed: " + rfidUid; // Update last scanned RFID UID
+    return; // Exit if RFID is not allowed
+  }
+
+  DoorController::open_close();                // If a valid RFID UID is scanned, open the door
+}
+
+void loop() {
+  scan_id(); // Call the function to scan for RFID tags
 
   // Handle incoming HTTP requests for the web server
   server.handleClient(); // Process incoming HTTP requests for the web server
 
-  DoorController::toggle();
+  // DoorController::toggle();
   delay(500);
 }

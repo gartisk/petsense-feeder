@@ -15,11 +15,6 @@ extern ESP8266WebServer server;
 // This variable is defined in catfeeder.ino and updated/read by multiple modules.
 extern String lastScannedRfidUID;
 
-// Declare global variables for settings (defined in catfeeder.ino)
-// extern String currentDoorOpenTime;
-// extern String currentDoorCloseTime;
-extern DynamicJsonDocument rfidSettingsDoc;
-
 // Function declarations for web server-related operations
 String getContentType(String filename);
 bool handleFileRequest(String path);

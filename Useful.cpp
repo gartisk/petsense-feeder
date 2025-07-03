@@ -3,15 +3,23 @@
 
 // Utility function for LED error indication
 // Keeping it in the main sketch for simplicity, but could be moved to a 'utils.h/.cpp'
-bool ledStatus ( int blinkingTimes, int ledDelay) {
-  pinMode(LED_STATUS, OUTPUT); // Ensure the onboard LED pin is set as output
+
+bool blinkingLED ( int ledPin, int blinkingTimes, int ledDelay) {
   for ( int i = 0; i <= blinkingTimes; i++ ){
-    digitalWrite(LED_STATUS, HIGH);
+    digitalWrite(ledPin, HIGH);
     delay(ledDelay);
 
-    digitalWrite(LED_STATUS, LOW);
+    digitalWrite(ledPin, LOW);
     delay(ledDelay);
   }
 
   return false;
+}
+
+bool ledStatus ( int blinkingTimes, int ledDelay) {
+  return blinkingLED(LED_STATUS, blinkingTimes, ledDelay);
+}
+
+bool ledError ( int blinkingTimes, int ledDelay) {
+  return blinkingLED(LED_STATUS, blinkingTimes, ledDelay);
 }
