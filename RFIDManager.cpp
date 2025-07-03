@@ -93,23 +93,37 @@ String scan_rfid_card() {
 
 bool isAllowedRFID(const String& rfid) {
     // Check if the RFID is in the allowed list
-    JsonObject settings;
+    JsonObject settings = SettingsManager::cached_settings.as<JsonObject>();
     if ( !SettingsManager::cached_settings.containsKey("RFID_LIST") ) {
         LOG_ERROR("RFIDManager", __FUNCTION__, "Failed to get settings.");
         return false;
     }
 
-    if (!settings.containsKey("RFID_LIST")) {
-        LOG_ERROR("RFIDManager", __FUNCTION__, "RFID_LIST not found in settings.");
+    // if (!settings.containsKey("RFID_LIST")) {
+    //     LOG_ERROR("RFIDManager", __FUNCTION__, "RFID_LIST not found in settings.");
+    //     return false;
+    // }
+
+    JsonArray allowedRFIDs = settings["RFID_LIST"].as<JsonArray>();
+    if (allowedRFIDs.isNull()) {
+        LOG_ERROR("RFIDManager", __FUNCTION__, "RFID_LIST is null.");
         return false;
     }
 
-    JsonArray allowedRFIDs = settings["RFID_LIST"].as<JsonArray>();
+    // Iterate through the allowed RFID list
     for (const auto& allowedRFID : allowedRFIDs) {
-        if (allowedRFID["ID"].as<String>() == rfid && allowedRFID["ALLOWED"].as<bool>()) {
+        // Check if the RFID matches and is allowed
+        if (allowedRFID["ID"].as<String>() == rfid && allowedRFID["ALLOWED"].as<String>() == "true") {
+            LOG_INFO("RFID is allowed: " + rfid);
             return true; // RFID is allowed
         }
     }
+    // for (const auto& allowedRFID : allowedRFIDs) {
+
+    //     if (allowedRFID["ID"].as<String>() == rfid && allowedRFID["ALLOWED"].as<String>() == "true") {
+    //         return true; // RFID is allowed
+    //     }
+    // }
 
     LOG_ERROR("RFIDManager", __FUNCTION__, "RFID not found in allowed list.");
     return false; // RFID not found in allowed list

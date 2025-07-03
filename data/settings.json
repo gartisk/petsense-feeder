@@ -8,19 +8,19 @@
     "DOOR_CLOSE_ANGLE": 0,
     "DOOR_OPEN_SPEED": 100,
     "DOOR_STEP_INTERVAL": 10,
-    "DOOR_DELAYER_DIVISOR": 1000, // Used to calculate delay intervals
+    "DOOR_DELAYER_DIVISOR": 1000,
     "DOOR_CLOSE_SPEED": 100,
     "DOOR_CLOSE_WAIT": 10000,
     "RFID_LIST": [
         {
             "ID": "EE:E7:C1:01",
             "NAME": "Clone",
-            "ALLOWED": true
+            "ALLOWED": "true"
         },
         {
             "ID": "AB:99:F1:02",
             "NAME": "Pantera",
-            "ALLOWED": false
+            "ALLOWED": "false"
         }
     ]
 }

@@ -21,7 +21,7 @@ void setup() {
   // Initialize LEDs
   LOG_INFO("LEDs - Initializing");
   pinMode(LED_STATUS, OUTPUT);
-  // pinMode(LED_ERROR, OUTPUT);
+  pinMode(LED_ERROR, OUTPUT);
 
   // Initialize the LED status
   ledStatus(5, 50);
@@ -65,6 +65,6 @@ void loop() {
   // Handle incoming HTTP requests for the web server
   server.handleClient(); // Process incoming HTTP requests for the web server
 
-  // DoorController::toggle();
+  DoorController::toggle();
   delay(500);
 }

@@ -13,7 +13,7 @@ bool blinkingLED ( int ledPin, int blinkingTimes, int ledDelay) {
     delay(ledDelay);
   }
 
-  return false;
+  return true;
 }
 
 bool ledStatus ( int blinkingTimes, int ledDelay) {

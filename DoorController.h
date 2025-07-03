@@ -14,8 +14,9 @@ class DoorController {
 public:
 
     static void begin() {
-        door_servo.attach(DOOR_PIN, 500, 2400);
+        door_servo.attach(DOOR_PIN);
         pinMode(DOOR_BTN_PIN, INPUT_PULLUP);
+        
         close();
         lastButtonPressTime = 0;
         LOG_INFO("DoorController initialized.");

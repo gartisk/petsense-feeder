@@ -25,14 +25,26 @@ public:
 
     // load
     static bool load() {
+        LOG_INFO(String(SETTINGS_FILE_PATH));
+        
         File file = FileManager::open(SETTINGS_FILE_PATH, "r");
         if (!file) {
             LOG_ERROR("SettingsManager", __FUNCTION__, "Failed to open settings file.");
             return false;
         }
         
+
+        String fileContent;
+        while (file.available()) {
+            fileContent += (char)file.read();
+        }
+        file.seek(0); // Reset file pointer for deserialization
+
         DeserializationError error = deserializeJson(cached_settings, file);
         file.close();
+
+        LOG_INFO("Settings file content: " + fileContent);
+        
         
         if (error) {
             LOG_ERROR("SettingsManager", __FUNCTION__, error.c_str());

@@ -27,7 +27,7 @@
 
 #define SETTINGS_FILE_PATH "/settings.json" // File to store settings in LittleFS
 #define SETTINGS_FILE_DEFAULT_PATH "/settings_default.json" // Path to the settings file in LittleFS
-#define SETTINGS_FILE_SIZE 1024 // Size of the settings file in bytes (adjust as needed)
+#define SETTINGS_FILE_SIZE 2048 // Size of the settings file in bytes (adjust as needed)
 
 // Logging Configuration
 #define LOG_LEVEL 4  // 0=NONE, 1=ERROR, 2=WARN, 3=INFO, 4=DEBUG
