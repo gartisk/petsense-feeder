@@ -14,11 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const newOwnerNameInput = document.getElementById('new-owner-name');
 
 
-
-    const saveSettingsBtn = document.getElementById('save-settings-btn');
-
-
-
     // --- LOAD APP SETTINGS ---
     const saveWarningDiv = document.getElementById('save-warning');
     const doorMaxOpeningInput = document.getElementById('door-max-opening');
@@ -336,17 +331,45 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Test Settings ---
-    const testSettingsBtn = document.getElementById('test-settings-btn');
-    testSettingsBtn.addEventListener('click', () => {
+    function mountSettings(){
+        const rfidEntries = [];
+        rfidListContainer.querySelectorAll('.flex').forEach(item => {
+            const rfidId = item.querySelector('p:nth-child(1) span').textContent;
+            const ownerName = item.querySelector('p:nth-child(2) span').textContent;
+            const isAllowed = item.querySelector('p:nth-child(3) span').textContent === 'Yes' ? "true" : "false";
+            rfidEntries.push({ ID: rfidId, NAME: ownerName, ALLOWED: isAllowed });
+        });
+
         const settings = {
             DOOR_OPEN_ANGLE: doorMaxOpeningInput.value,
             DOOR_CLOSE_ANGLE: doorMaxClosingInput.value,
             DOOR_OPEN_SPEED: doorOpeningSpeedInput.value,
             DOOR_CLOSE_SPEED: doorClosingSpeedInput.value,
-            DOOR_CLOSE_WAIT: delayToCloseInput.value
-
+            DOOR_CLOSE_WAIT: delayToCloseInput.value,
+            RFID_LIST: rfidEntries
         };
+
+        return settings;
+    }
+
+    // --- Restore Settings ---
+    const restoreSettingsBtn = document.getElementById('restore-settings-btn');
+    // Show save confirm modal when save button is clicked
+    restoreSettingsBtn.addEventListener('click', () => {
+        document.getElementById('restore-confirm-modal').showModal();
+    });
+
+    document.getElementById('confirm-restore-btn').addEventListener('click', () => {
+       loadSettings(function(settings){
+        fnLoadSuccess(settings);
+        document.getElementById('restore-confirm-modal').close();
+      });
+    });
+
+    // --- Test Settings ---
+    const testSettingsBtn = document.getElementById('test-settings-btn');
+    testSettingsBtn.addEventListener('click', () => {
+        const settings = mountSettings();
 
         console.log('Testing settings:', settings);
         fetch('/api/settings', {
@@ -360,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
             .then(data => {
                 console.log('Server response:', data);
-                hideSaveWarning(); // Hide warning on successful test
+                hideSaveWarning();
             })
             .catch(error => {
                 console.error('Error testing settings:', error);
@@ -368,22 +391,21 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 
-    // --- Save Settings ---
-    saveSettingsBtn.addEventListener('click', () => {
-        // const rfidEntries = [];
-        // rfidListContainer.querySelectorAll('.flex').forEach(item => {
-        //     const rfidId = item.querySelector('p:nth-child(1) span').textContent;
-        //     const ownerName = item.querySelector('p:nth-child(2) span').textContent;
-        //     rfidEntries.push({ id: rfidId, owner: ownerName });
-        // });
+    
+    
 
-        const settings = {
-            DOOR_OPEN_ANGLE: doorMaxOpeningInput.value,
-            DOOR_CLOSE_ANGLE: doorMaxClosingInput.value,
-            DOOR_OPEN_SPEED: doorOpeningSpeedInput.value,
-            DOOR_CLOSE_SPEED: doorClosingSpeedInput.value,
-            DOOR_CLOSE_WAIT: delayToCloseInput.value
-        };
+    const saveSettingsBtn = document.getElementById('save-settings-btn');
+    // Show save confirm modal when save button is clicked
+    saveSettingsBtn.addEventListener('click', () => {
+        document.getElementById('save-confirm-modal').showModal();
+    });
+
+    // --- Save Settings ---
+    // Handle confirm save in modal
+    const confirmSaveBtn = document.getElementById('confirm-save-btn');
+    confirmSaveBtn.addEventListener('click', () => {
+
+        const settings = mountSettings();
 
         console.log('Settings to save:', settings);
 
@@ -398,13 +420,16 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(data => {
             console.log('Server response:', data);
-            hideSaveWarning(); // Hide warning on successful save
-            alert('Settings saved successfully!');
+            
+            document.getElementById('save-confirm-modal').close();
+            hideSaveWarning();
+            
         })
         .catch(error => {
             console.error('Error saving settings:', error);
             alert(`Failed to save settings: ${error.message}.`);
         });
     });
+    
 
 });

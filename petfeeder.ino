@@ -47,15 +47,20 @@ void scan_id(){
   if ( rfidUid.length() < 1 ) {
     return;
   }
+  ledStatus(1, 100); // Indicate scanning with LED
 
   if ( !isAllowedRFID(rfidUid) ) { 
-    ledError(5, 200); // Indicate error with LED
+    ledError(2, 200); // Indicate error with LED
     LOG_ERROR("RFIDManager", __FUNCTION__, "RFID not allowed: " + rfidUid);
     
     lastScannedRfidUID = "Not allowed: " + rfidUid; // Update last scanned RFID UID
     return; // Exit if RFID is not allowed
   }
 
+  ledStatus(2, 100); // Indicate success with LED
+  LOG_INFO("RFID allowed: " + rfidUid);
+  lastScannedRfidUID = "Allowed: " + rfidUid; // Update last scanned RFID UID
+  
   DoorController::open_close();                // If a valid RFID UID is scanned, open the door
 }
 

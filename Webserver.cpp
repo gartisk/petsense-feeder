@@ -261,7 +261,9 @@ void setup_webserver () {
   server.on("/api/settings", HTTP_GET, handleSettingsRead);
   server.on("/api/settings", HTTP_PUT, handleSettingsUpdate);
   server.on("/api/settings", HTTP_POST, handleSettingsSave);
-
+  
+  // server.on("/api/settings/restore", HTTP_POST, handleRestoreSettings);
+  
   // Set up a generic handler for any unmapped file requests (e.g., /style.css)
   server.onNotFound([]() {
     if (!handleFileRequest(server.uri())) {
