@@ -24,7 +24,7 @@ public:
     static File open(const char* path, const char* mode) {
         File file = LittleFS.open(path, mode);
         if (!file) {
-            Serial.printf("Failed to open file: %s\n", path);
+            LOG_ERROR("FileManager", __FUNCTION__, ("Failed to open file: " + String(path)).c_str());
         }
         return file;
     }
@@ -66,9 +66,11 @@ public:
     static String listFiles() {
         Dir dir = LittleFS.openDir("/");
         String fileList = "Files in LittleFS:\n";
+
         while (dir.next()) {
             fileList += "File: " + dir.fileName() + " Size: " + dir.fileSize() + "\n";
         }
+        
         LOG_DEBUG("FileManager", __FUNCTION__, fileList.c_str());
 
         return fileList;

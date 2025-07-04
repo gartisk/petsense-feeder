@@ -11,7 +11,10 @@
 - **LittleFS** 🗂️  
     - [LittleFS Plugin](https://github.com/earlephilhower/arduino-littlefs-upload/)
 
-## 🛠️ Installing LittleFS Plugin
+
+## Recommended Plugins
+
+### 🛠️ Installing LittleFS Plugin
 
 To install the LittleFS plugin, use one of the following commands:
 
@@ -21,13 +24,44 @@ wget https://github.com/earlephilhower/arduino-littlefs-upload/releases/download
 
 # Using curl 🌐
 curl -LO https://github.com/earlephilhower/arduino-littlefs-upload/releases/download/1.5.4/arduino-littlefs-upload-1.5.4.vsix
-```
 
-Move the downloaded file to the Arduino plugins directory:
-
-```sh
+# Move to the folder
 mv arduino-littlefs-upload-1.5.4.vsix ~/.arduino15/plugins/
 ```
+
+### 🛠️ Installing Exception Decoder
+```sh
+# Using wget 🐧
+wget https://github.com/dankeboy36/esp-exception-decoder/releases/download/1.1.0/esp-exception-decoder-1.1.0.vsix
+
+# Using curl 🌐
+curl -LO https://github.com/dankeboy36/esp-exception-decoder/releases/download/1.1.0/esp-exception-decoder-1.1.0.vsix
+
+# Move to the folder
+mv esp-exception-decoder-1.1.0.vsix ~/.arduino15/plugins/
+```
+
+
+## App Config
+
+1. Create the file wifi.h(more details bellow)
+2. Upload /data using littleFS
+3. Upload the application
+4. Access the configuration page in your web browser.
+
+
+### Create in root folder the file "wifi.h" with following content:
+```cpp
+    #ifndef WIFI_H
+    #define WIFI_H
+
+    const char* ssid = "<SSID>";
+    const char* password = "<WIFIP ASSWORD>";
+
+    #endif // WIFI_H
+```
+
+
 
 ## 🚀 MVP Features
 - **WiFi Access Point** 📶
