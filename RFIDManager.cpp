@@ -1,14 +1,15 @@
 
+#include "RFIDManager.h"
+
 #include <SPI.h>
 #include <MFRC522.h>
 #include "config.h"
-#include "RFIDManager.h"
+#include "Useful.h"
 // Define the MFRC522 instance here. It must only be defined once.
+
 // RFID_SPI_PIN and RFID_RST_PIN are defined in config.h
 MFRC522 mfrc522(RFID_SPI_PIN, RFID_RST_PIN);
-
 const size_t MAX_RFID_HISTORY = RFID_HISTORY_SIZE;
-
 std::deque<RFIDEntry> lastRFIDs;
 
 void addRFIDToHistory(const RFIDEntry& entry) {
@@ -45,25 +46,11 @@ void setup_rfid_module() {
 
     if (version == 0x00 || version == 0xFF) {
         LOG_ERROR( "setup_rfid_module", __FUNCTION__, "MFRC522 not found! Check wiring and power.");
-        ledError(2, 100); // Indicate error with LED
+        LED_ERROR_RFID_DEVICE_NOT_FOUND(); // Indicate error with LED
         return; // Halt setup if MFRC522 is not found
     } 
 
     LOG_INFO("MFRC522 ready.");
-}
-
-
-// 
-String convertUidToString(const byte* uid, byte size) {
-    String sCardID = "";
-    for (byte i = 0; i < size; i++) {
-        if (i > 0) sCardID += ":";
-        sCardID += uid[i] < 0x10 ? "0" : "";
-        sCardID += String(uid[i], HEX);
-    }
-    sCardID.toUpperCase();
-
-    return sCardID;
 }
 
 // Scan RFID Card return the UID as a char array
@@ -74,8 +61,6 @@ String scan_rfid_card() {
         // No card or failed to read
         return "";
     }
-
-    ledStatus(2, 500); // Reading card, indicate with LED
 
     // Read the card UID
     String sCardID = convertUidToString(mfrc522.uid.uidByte, mfrc522.uid.size);

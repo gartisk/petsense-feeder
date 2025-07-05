@@ -243,9 +243,10 @@ void setup_webserver () {
   // }
   
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+    delay(WIFI_SETUP_RETRY_DELAY); // Wait for Wi-Fi connection
     Serial.print(".");
   }
+
   Serial.println("");
   Serial.println("WiFi connected.");
   Serial.print("IP Address: ");

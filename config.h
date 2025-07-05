@@ -50,6 +50,7 @@
 #define DOOR_DELAYER_DIVISOR 1000 // Example: Divisor for the delay between servo movements (in milliseconds).
 
 // WEB SERVER
+#define WIFI_SETUP_RETRY_DELAY 1000
 #define SERVER_PORT 80
 #define SERVER_PAGE_MAIN "index.html"
 #define SERVER_NOT_ALLOWED_FILES \
@@ -57,15 +58,22 @@
     "/settings.json" \
   }
 
+
 // Function declaration only (definition must be in a .cpp file)
-void BLINK_LED(int ledPin, int blinkingTimes, int ledDelay);
+void startLedBlink(int ledPin, int blinkingTimes, int ledDelay);
+void updateLedBlink();
 
 // Example LED message macros (no semicolon at end)
-#define LED_MSG_START()           BLINK_LED(LED_STATUS, 10, 100)
-#define LED_MSG_RFID_READ()       BLINK_LED(LED_STATUS, 2, 100)
-#define LED_MSG_DOOR_OPEN()       BLINK_LED(LED_STATUS, 1, 100)
+#define LED_MSG_START()           startLedBlink(LED_STATUS, 10, 100)
+#define LED_MSG_DOOR_OPEN()       startLedBlink(LED_STATUS, 1, 100)
+#define LED_MSG_DOOR_CLOSE()      startLedBlink(LED_STATUS, 2, 100)
 
-#define LED_ERROR_RFID_INVALID()  BLINK_LED(LED_ERROR, 2, 200)
+#define LED_MSG_RFID_READ()       startLedBlink(LED_STATUS, 1, 100)
+#define LED_MSG_RFID_ALLOWED()    startLedBlink(LED_STATUS, 2, 100)
+
+#define LED_ERROR_RFID_INVALID()  startLedBlink(LED_ERROR, 2, 200)
+#define LED_ERROR_RFID_DEVICE_NOT_FOUND() startLedBlink(LED_ERROR, 3, 200)
+
 #endif // CONFIG_H
 
 

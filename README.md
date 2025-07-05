@@ -8,7 +8,6 @@
 
 ## 🔌 Plugins
 - **MRFC522** by GitCommunity 🏷️
-- **Ticker** by stefan staub
 - **LittleFS** 🗂️  
     - [LittleFS Plugin](https://github.com/earlephilhower/arduino-littlefs-upload/)
 

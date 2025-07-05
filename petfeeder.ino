@@ -47,18 +47,22 @@ void scan_id(){
   if ( rfidUid.length() < 1 ) {
     return;
   }
-  ledStatus(1, 100); // Indicate scanning with LED
+
+  LED_MSG_RFID_READ(); // Reading card, indicate with LED
+  //ledStatus(1, 100); // Indicate scanning with LED
 
   if ( !isAllowedRFID(rfidUid) ) { 
-    
     LED_ERROR_RFID_INVALID();
     LOG_ERROR("RFIDManager", __FUNCTION__, "RFID not allowed: " + rfidUid);
     
     lastScannedRfidUID = "Not allowed: " + rfidUid; // Update last scanned RFID UID
+
     return; // Exit if RFID is not allowed
   }
 
-  ledStatus(2, 100); // Indicate success with LED
+  // Indicate allowed RFID with LED
+  LED_MSG_RFID_ALLOWED(); 
+
   LOG_INFO("RFID allowed: " + rfidUid);
   lastScannedRfidUID = "Allowed: " + rfidUid; // Update last scanned RFID UID
   
@@ -67,10 +71,12 @@ void scan_id(){
 
 void loop() {
   scan_id(); // Call the function to scan for RFID tags
-
+  
   // Handle incoming HTTP requests for the web server
   server.handleClient(); // Process incoming HTTP requests for the web server
-
+  
+  DoorController::process();
   DoorController::toggle();
-  delay(500);
+  
+  updateLedBlink(); 
 }
