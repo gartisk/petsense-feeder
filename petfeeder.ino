@@ -24,7 +24,7 @@ void setup() {
   pinMode(LED_ERROR, OUTPUT);
 
   // Initialize the LED status
-  ledStatus(5, 50);
+  LED_MSG_START();
 
   // Initialize the RFID module
   LOG_INFO("RFID Module - Initializing");
@@ -50,7 +50,8 @@ void scan_id(){
   ledStatus(1, 100); // Indicate scanning with LED
 
   if ( !isAllowedRFID(rfidUid) ) { 
-    ledError(2, 200); // Indicate error with LED
+    
+    LED_ERROR_RFID_INVALID();
     LOG_ERROR("RFIDManager", __FUNCTION__, "RFID not allowed: " + rfidUid);
     
     lastScannedRfidUID = "Not allowed: " + rfidUid; // Update last scanned RFID UID

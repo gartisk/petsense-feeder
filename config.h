@@ -57,7 +57,15 @@
     "/settings.json" \
   }
 
+// Function declaration only (definition must be in a .cpp file)
+void BLINK_LED(int ledPin, int blinkingTimes, int ledDelay);
 
+// Example LED message macros (no semicolon at end)
+#define LED_MSG_START()           BLINK_LED(LED_STATUS, 10, 100)
+#define LED_MSG_RFID_READ()       BLINK_LED(LED_STATUS, 2, 100)
+#define LED_MSG_DOOR_OPEN()       BLINK_LED(LED_STATUS, 1, 100)
+
+#define LED_ERROR_RFID_INVALID()  BLINK_LED(LED_ERROR, 2, 200)
 #endif // CONFIG_H
 
 
