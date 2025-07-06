@@ -15,7 +15,7 @@ unsigned long DoorController::waitTime = 0;
 bool DoorController::waitingToClose = false;
 
 void DoorController::begin() {
-    door_servo.attach(DOOR_PIN);
+    door_servo.attach(DOOR_PIN, 500, 2400); // Attach the servo to the specified pin with min and max pulse width
     pinMode(DOOR_BTN_PIN, INPUT_PULLUP);
     close();
 
@@ -30,45 +30,58 @@ void DoorController::begin() {
 void DoorController::process() {
     unsigned long now = millis();
 
-    // Handle servo movement
-    if (door_state == DOOR_OPENING || door_state == DOOR_CLOSING) {
-        if (now - lastMoveTime >= (unsigned long)moveInterval) {
-            lastMoveTime = now;
-            if (door_state == DOOR_OPENING && currentAngle < targetAngle) {
-                currentAngle += moveStep;
-                if (currentAngle > targetAngle) currentAngle = targetAngle;
-                door_servo.write(currentAngle);
-            } else if (door_state == DOOR_CLOSING && currentAngle > targetAngle) {
-                currentAngle -= moveStep;
-                if (currentAngle < targetAngle) currentAngle = targetAngle;
-                door_servo.write(currentAngle);
-            }
+    bool isOpening = door_state == DOOR_OPENING;
+    bool isClosing = door_state == DOOR_CLOSING;
+    bool isWaiting = (door_state == DOOR_WAITING && waitingToClose);
+   
+    if ( !isOpening && !isClosing && !isWaiting)  {
+        return;
+    }
 
-            // Check if movement finished
-            if (currentAngle == targetAngle) {
-                if (door_state == DOOR_OPENING) {
-                    door_state = DOOR_OPEN;
-                    LED_MSG_DOOR_OPEN();
-                    LOG_INFO("Door opened.");
-                    if (waitingToClose) {
-                        waitStartTime = now;
-                        door_state = DOOR_WAITING;
-                    }
-                } else if (door_state == DOOR_CLOSING) {
-                    door_state = DOOR_CLOSED;
-                    LED_MSG_DOOR_CLOSE();
-                    LOG_INFO("Door closed.");
-                    waitingToClose = false;
+    bool isOpeningOrClosingDebounced = isDebounced(lastMoveTime, moveInterval, now);    
+    bool isWaitingDebounced = isDebounced(waitStartTime, waitTime, now);
+
+    if ( isOpeningOrClosingDebounced ){
+            
+        // Open the Door
+        if( isOpening && currentAngle < targetAngle ) {
+            lastMoveTime = now; // Update last move time
+            currentAngle += moveStep;
+            
+            if (currentAngle > targetAngle) currentAngle = targetAngle;
+            door_servo.write(currentAngle); // Write the current angle to the servo
+
+        // Close the Door
+        } else if( isClosing && currentAngle > targetAngle ) {
+            lastMoveTime = now; // Update last move time
+            currentAngle -= moveStep;
+
+            if (currentAngle < targetAngle) currentAngle = targetAngle;
+            door_servo.write(currentAngle); // Write the current angle to the servo
+        }
+
+        //  Movement Finished
+        if (currentAngle == targetAngle) {
+            if ( isOpening ) {
+                door_state = DOOR_OPEN;
+                LED_MSG_DOOR_OPEN();
+                LOG_INFO("Door opened.");
+                if (waitingToClose) {
+                    waitStartTime = now;
+                    door_state = DOOR_WAITING;
                 }
+            } else if ( isClosing) {
+                door_state = DOOR_CLOSED;
+                LED_MSG_DOOR_CLOSE();
+                LOG_INFO("Door closed.");
+                waitingToClose = false;
             }
         }
     }
 
-    // Handle waiting after open before closing
-    if (door_state == DOOR_WAITING && waitingToClose) {
-        if (now - waitStartTime >= waitTime) {
-            close();
-        }
+        // Handle waiting after open before closing
+    if ( isWaiting && waitingToClose && isWaitingDebounced) {
+        close();
     }
 }
 
@@ -106,7 +119,8 @@ void DoorController::close() {
 
 void DoorController::open_close() {
     open();
-    waitTime = SettingsManager::cached_settings["DOOR_CLOSE_WAIT"] | 10000;
+    waitTime = SettingsManager::cached_settings["DOOR_CLOSE_WAIT"] | 10000; // Default to 10 seconds if not set
+    lastMoveTime = millis();
     waitingToClose = true;
     // The rest is handled in process()
     LOG_INFO("Door open_close sequence started (non-blocking)...");
