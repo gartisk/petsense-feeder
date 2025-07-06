@@ -20,7 +20,6 @@ String getContentType(String filename);
 bool handleFileRequest(String path);
 void handleRoot();
 void handleNotFound();
-void handleSaveSettings();
 void handleRfidStatus();
 
 // Unified function to set up Wi-Fi and web server routes

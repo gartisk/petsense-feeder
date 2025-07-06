@@ -1,6 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "LedBlinker.h"
+
 // Pin Configuration Table
 // +------+--------+-------------+-------------+-------------------------------------------------------------+
 // | Label| GPIO   | Input       | Output      | Notes                                                       |
@@ -46,7 +48,10 @@
 #define DOOR_DEBOUNCE_DELAY 50 // Debounce delay for the button in milliseconds.
 
 #define DOOR_OPEN_ANGLE 180 // Example: Servo angle when the door is fully open.
+#define DOOR_OPEN_SPEED 50 // Example: Speed of the door opening (in degrees per second).
+
 #define DOOR_CLOSED_ANGLE 0 // Example: Servo angle when the door is fully closed.
+#define DOOR_CLOSE_SPEED 50 // Example: Speed of the door closing (in degrees per
 #define DOOR_DELAYER_DIVISOR 1000 // Example: Divisor for the delay between servo movements (in milliseconds).
 
 // WEB SERVER
@@ -60,19 +65,20 @@
 
 
 // Function declaration only (definition must be in a .cpp file)
-void startLedBlink(int ledPin, int blinkingTimes, int ledDelay);
-void updateLedBlink();
+// void startLedBlink(int ledPin, int blinkingTimes, int ledDelay);
+// void updateLedBlink();
 
 // Example LED message macros (no semicolon at end)
-#define LED_MSG_START()           startLedBlink(LED_STATUS, 10, 100)
-#define LED_MSG_DOOR_OPEN()       startLedBlink(LED_STATUS, 1, 100)
-#define LED_MSG_DOOR_CLOSE()      startLedBlink(LED_STATUS, 2, 100)
+#define LED_MSG_START()           GreenBlinker::start(5, 100)
 
-#define LED_MSG_RFID_READ()       startLedBlink(LED_STATUS, 1, 100)
-#define LED_MSG_RFID_ALLOWED()    startLedBlink(LED_STATUS, 2, 100)
+#define LED_MSG_DOOR_OPEN()       GreenBlinker::start(1, 100)
+#define LED_MSG_DOOR_CLOSE()      GreenBlinker::start(2, 100)
 
-#define LED_ERROR_RFID_INVALID()  startLedBlink(LED_ERROR, 2, 200)
-#define LED_ERROR_RFID_DEVICE_NOT_FOUND() startLedBlink(LED_ERROR, 3, 200)
+#define LED_MSG_RFID_READ()       GreenBlinker::start(1, 100)
+#define LED_MSG_RFID_ALLOWED()    GreenBlinker::start(2, 100)
+
+#define LED_ERROR_RFID_INVALID()  RedBlinker::start(2, 200)
+#define LED_ERROR_RFID_DEVICE_NOT_FOUND() RedBlinker::start(3, 200)
 
 #endif // CONFIG_H
 

@@ -13,4 +13,8 @@ inline String convertUidToString(const byte* uid, byte size) {
     return sCardID;
 }
 
+inline bool isDebounced(unsigned long lastPressTime, unsigned long debounceDelay, unsigned long time = millis() ) {
+    return (time - lastPressTime) >= debounceDelay;
+}
+
 #endif // USEFUL_H

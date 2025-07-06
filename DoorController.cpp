@@ -18,6 +18,7 @@ void DoorController::begin() {
     door_servo.attach(DOOR_PIN);
     pinMode(DOOR_BTN_PIN, INPUT_PULLUP);
     close();
+
     lastButtonPressTime = 0;
     LOG_INFO("DoorController initialized.");
     LOG_INFO("Servo Pin: " + String(DOOR_PIN));
@@ -73,11 +74,13 @@ void DoorController::process() {
 
 void DoorController::open() {
     int openAngle = SettingsManager::cached_settings["DOOR_OPEN_ANGLE"] | DOOR_OPEN_ANGLE;
-    int openSpeed = SettingsManager::cached_settings["DOOR_OPEN_SPEED"] | 50;
+    int openSpeed = SettingsManager::cached_settings["DOOR_OPEN_SPEED"] | DOOR_OPEN_SPEED;
+
     moveStep = 5;
     moveInterval = DOOR_DELAYER_DIVISOR / openSpeed;
     targetAngle = openAngle;
     currentAngle = door_servo.read();
+
     door_state = DOOR_OPENING;
     lastMoveTime = millis();
     waitingToClose = false;
@@ -86,12 +89,13 @@ void DoorController::open() {
 
 void DoorController::close() {
     int closeAngle = SettingsManager::cached_settings["DOOR_CLOSE_ANGLE"] | DOOR_CLOSED_ANGLE;
-    int closeSpeed = SettingsManager::cached_settings["DOOR_CLOSE_SPEED"] | 50;
+    int closeSpeed = SettingsManager::cached_settings["DOOR_CLOSE_SPEED"] | DOOR_CLOSE_SPEED;
 
     moveStep = 5;
     moveInterval = DOOR_DELAYER_DIVISOR / closeSpeed;
     targetAngle = closeAngle;
     currentAngle = door_servo.read();
+    
     door_state = DOOR_CLOSING;
     lastMoveTime = millis();
     waitingToClose = false;
@@ -102,7 +106,7 @@ void DoorController::close() {
 
 void DoorController::open_close() {
     open();
-    waitTime = SettingsManager::cached_settings["DOOR_CLOSE_WAIT"] | 1000;
+    waitTime = SettingsManager::cached_settings["DOOR_CLOSE_WAIT"] | 10000;
     waitingToClose = true;
     // The rest is handled in process()
     LOG_INFO("Door open_close sequence started (non-blocking)...");
@@ -110,22 +114,29 @@ void DoorController::open_close() {
 
 void DoorController::toggle() {
     int buttonState = digitalRead(DOOR_BTN_PIN);
-    if (buttonState == LOW && isDebounced()) {
-        lastButtonPressTime = millis();
-        if (door_state == DOOR_CLOSED) {
-            LOG_INFO("Button pressed: Door is currently closed. Opening door.");
-            open();
-        } else if (door_state == DOOR_OPEN) {
-            LOG_INFO("Button pressed: Door is currently open. Closing door.");
-            close();
-        }
+
+    if (buttonState != LOW ) {
+        return; // Button not pressed
     }
+
+    if (!isDebounced(lastButtonPressTime, DOOR_DEBOUNCE_DELAY)) {
+        return; // Ignore if button press is not debounced
+    }
+
+    // refresh last button press time
+    // This is to prevent multiple toggles from a single press
+    lastButtonPressTime = millis();
+    
+    if (door_state == DOOR_CLOSED) {
+        LOG_INFO("Button pressed: Door is currently closed. Opening door.");
+        open();
+    } else if (door_state == DOOR_OPEN) {
+        LOG_INFO("Button pressed: Door is currently open. Closing door.");
+        close();
+    }
+    
 }
 
 DoorState DoorController::get_state() {
     return door_state;
-}
-
-bool DoorController::isDebounced() {
-    return (millis() - lastButtonPressTime) > DOOR_DEBOUNCE_DELAY;
 }

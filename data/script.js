@@ -1,14 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // --- Element Selectors ---
-
-
-
-    const dispenserScheduleList = document.getElementById('dispenser-schedule-list');
-
-    const timeIntervalsContainer = document.getElementById('time-intervals-container');
-    const rfidRequiredCheckbox = document.getElementById('rfid-required-checkbox');
-
-
+document.addEventListener('DOMContentLoaded', () => {    // --- Element Selectors ---
 
     const newRfidIdInput = document.getElementById('new-rfid-id');
     const newOwnerNameInput = document.getElementById('new-owner-name');

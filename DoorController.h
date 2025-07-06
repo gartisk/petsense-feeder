@@ -19,7 +19,7 @@ public:
     static void open_close();
     static void toggle();
     static DoorState get_state();
-    static bool isDebounced();
+    // static bool isDebounced();
 
 private:
     static Servo door_servo;

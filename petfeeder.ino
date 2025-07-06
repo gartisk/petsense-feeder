@@ -6,6 +6,7 @@
 #include "Webserver.h" // Handles all web server functionalities
 #include "RFIDManager.h"
 #include "DoorController.h"
+#include "LedBlinker.h" // Handles LED blinking functionalities
 
 String lastScannedRfidUID = "No scan yet"; // Stores the last scanned RFID UID for web display
 
@@ -20,8 +21,8 @@ void setup() {
 
   // Initialize LEDs
   LOG_INFO("LEDs - Initializing");
-  pinMode(LED_STATUS, OUTPUT);
-  pinMode(LED_ERROR, OUTPUT);
+  GreenBlinker::begin(LED_STATUS); // or your green LED pin
+  RedBlinker::begin(LED_ERROR);    // or your red LED pin
 
   // Initialize the LED status
   LED_MSG_START();
@@ -75,8 +76,11 @@ void loop() {
   // Handle incoming HTTP requests for the web server
   server.handleClient(); // Process incoming HTTP requests for the web server
   
+  GreenBlinker::update();
+  RedBlinker::update();
+
   DoorController::process();
   DoorController::toggle();
   
-  updateLedBlink(); 
+  //updateLedBlink(); 
 }

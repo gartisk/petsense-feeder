@@ -111,27 +111,27 @@ void handleRoot() {
 
 // Handles POST requests to "/save_settings" to update feeder settings.
 // Parses JSON payload from the web page.
-void handleSaveSettings() {
-  if (!server.hasArg("plain")) {
-    server.send(400, "application/json", "{\"status\":\"error\", \"message\":\"No data received\"}");
-    return;
-  }
+// void handleSaveSettings() {
+//   if (!server.hasArg("plain")) {
+//     server.send(400, "application/json", "{\"status\":\"error\", \"message\":\"No data received\"}");
+//     return;
+//   }
 
-  String body = server.arg("plain");
-  Serial.println("Received POST request body for settings save:");
-  Serial.println(body);
+//   String body = server.arg("plain");
+//   Serial.println("Received POST request body for settings save:");
+//   Serial.println(body);
 
-  StaticJsonDocument<SETTINGS_FILE_SIZE> doc;
-  DeserializationError error = deserializeJson(doc, body);
-  JsonObject obj = doc.as<JsonObject>();
+//   StaticJsonDocument<SETTINGS_FILE_SIZE> doc;
+//   DeserializationError error = deserializeJson(doc, body);
+//   JsonObject obj = doc.as<JsonObject>();
 
-  if (!SettingsManager::set(obj) || !SettingsManager::save()) {
-    server.send(500, "application/json", "{\"status\":\"error\", \"message\":\"Failed to save settings\"}");
-    return;
-  } 
+//   if (!SettingsManager::set(obj) || !SettingsManager::save()) {
+//     server.send(500, "application/json", "{\"status\":\"error\", \"message\":\"Failed to save settings\"}");
+//     return;
+//   } 
 
-  server.send(200, "application/json", "{\"status\":\"success\", \"message\":\"Settings saved\"}");
-}
+//   server.send(200, "application/json", "{\"status\":\"success\", \"message\":\"Settings saved\"}");
+// }
 
 // Handles GET requests to "/rfid_status" to provide real-time RFID data to the web page.
 void handleLastRFIDs() {
