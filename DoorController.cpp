@@ -86,8 +86,12 @@ void DoorController::process() {
 }
 
 void DoorController::open() {
-    int openAngle = SettingsManager::cached_settings["DOOR_OPEN_ANGLE"] | DOOR_OPEN_ANGLE;
-    int openSpeed = SettingsManager::cached_settings["DOOR_OPEN_SPEED"] | DOOR_OPEN_SPEED;
+    JsonObject settings = SettingsManager::cached_settings.as<JsonObject>();
+    LOG_INFO(String(SettingsManager::cached_settings.as<String>()));
+    
+    // is null or empty, use default values
+    int openAngle = settings["DOOR_OPEN_ANGLE"] != "" ? settings["DOOR_OPEN_ANGLE"] : DOOR_OPEN_ANGLE;
+    int openSpeed = settings["DOOR_OPEN_SPEED"] != "" ? settings["DOOR_OPEN_SPEED"] : DOOR_OPEN_SPEED;
 
     moveStep = 5;
     moveInterval = DOOR_DELAYER_DIVISOR / openSpeed;
@@ -97,12 +101,14 @@ void DoorController::open() {
     door_state = DOOR_OPENING;
     lastMoveTime = millis();
     waitingToClose = false;
-    LOG_INFO("Door opening (non-blocking)...");
+    LOG_INFO("Door Opening - Angle " + String(targetAngle) + " Speed " + String(openSpeed) + " MoveInterval " + String(moveInterval) + " (non-blocking)...");
 }
 
 void DoorController::close() {
-    int closeAngle = SettingsManager::cached_settings["DOOR_CLOSE_ANGLE"] | DOOR_CLOSED_ANGLE;
-    int closeSpeed = SettingsManager::cached_settings["DOOR_CLOSE_SPEED"] | DOOR_CLOSE_SPEED;
+    JsonObject settings = SettingsManager::cached_settings.as<JsonObject>();
+
+    int closeAngle = settings["DOOR_CLOSED_ANGLE"] != "" ? settings["DOOR_CLOSED_ANGLE"] : DOOR_CLOSED_ANGLE;
+    int closeSpeed = settings["DOOR_CLOSE_SPEED"] != "" ? settings["DOOR_CLOSE_SPEED"] : DOOR_CLOSE_SPEED;
 
     moveStep = 5;
     moveInterval = DOOR_DELAYER_DIVISOR / closeSpeed;
@@ -114,12 +120,14 @@ void DoorController::close() {
     waitingToClose = false;
     
     // Reset wait time for closing
-    LOG_INFO("Door closing (non-blocking)...");
+    LOG_INFO("Door Closing - Angle " + String(targetAngle) + " Speed " + String(closeSpeed) + " MoveInterval " + String(moveInterval) + " (non-blocking)...");
 }
 
 void DoorController::open_close() {
     open();
-    waitTime = SettingsManager::cached_settings["DOOR_CLOSE_WAIT"] | 10000; // Default to 10 seconds if not set
+    JsonObject settings = SettingsManager::cached_settings.as<JsonObject>();
+    waitTime = settings["DOOR_CLOSE_WAIT"] != "" ? settings["DOOR_CLOSE_WAIT"] : DOOR_CLOSE_WAIT; // Default to 10 seconds if not set
+
     lastMoveTime = millis();
     waitingToClose = true;
     // The rest is handled in process()

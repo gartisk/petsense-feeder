@@ -18,6 +18,7 @@ void setup() {
   // Initialize LittleFS filesystem
   LOG_INFO("Settings Manager - Initializing");
   SettingsManager::begin(); 
+  SettingsManager::load(); 
 
   // Initialize LEDs
   LOG_INFO("LEDs - Initializing");

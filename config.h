@@ -52,6 +52,7 @@
 
 #define DOOR_CLOSED_ANGLE 0 // Example: Servo angle when the door is fully closed.
 #define DOOR_CLOSE_SPEED 50 // Example: Speed of the door closing (in degrees per
+#define DOOR_CLOSE_WAIT 10000 // Example: Time to wait before closing the door after opening (in milliseconds).
 #define DOOR_DELAYER_DIVISOR 1000 // Example: Divisor for the delay between servo movements (in milliseconds).
 
 // WEB SERVER
