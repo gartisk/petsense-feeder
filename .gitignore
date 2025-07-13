@@ -1,2 +1,8 @@
+.pio/
 lib imported/
+_app/
+/data/favicon.svg
+/data/index.html
+/data/style.css
+/data/script.js
 wifi.h

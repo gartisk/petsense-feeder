@@ -12,6 +12,21 @@
     - [LittleFS Plugin](https://github.com/earlephilhower/arduino-littlefs-upload/)
 
 
+## Platform.io Configuration
+
+```sh
+    sudo apt update
+    sudo apt install python3-pip
+
+    pip install -U platformio
+    pio --version
+
+    pio project init --board nodemcuv2
+
+    pio lib install
+```
+
+
 ## Recommended Plugins
 
 ### 🛠️ Installing LittleFS Plugin
