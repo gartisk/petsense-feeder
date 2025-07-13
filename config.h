@@ -21,11 +21,29 @@
 // | A0   | ADC0   | Analog Input| X           |                                                             |
 // +------+--------+-------------+-------------+-------------------------------------------------------------+
 
+
+// Component Pin Mapping Table
+// +-------------+--------+-------------+-------------------+--------------------------------------------------------------+
+// | Component   | GPIO   | NodeMCU Pin | Notes                                                |
+// +-------------+--------+-------------+------------------------------------------------------+
+// | RFID522 SDA | GPIO15 | D8          | Chip select (pulled LOW at boot, perfect use)        |
+// | RFID522 SCK | GPIO14 | D5          | SPI Clock                                            |
+// | RFID522 MOSI| GPIO13 | D7          | SPI Master Out                                       |
+// | RFID522 MISO| GPIO12 | D6          | SPI Master In                                        |
+// | RFID522 RST | GPIO0  | D3          | RST (use only at startup)                            |
+// | RFID522 GND |   —    | —           | Connect to GND                                       |
+// | RFID522 VCC |   —    | —           | Connect to 3.3V                                      |
+// | Button      | GPIO16 | D0          | Input with INPUT_PULLUP, suitable for digital read    |
+// | Servo       | GPIO5  | D1          | PWM capable, stable                                  |
+// | Green LED   | GPIO4  | D2          | Standard digital output                              |
+// | Red LED     | GPIO2  | D4          | OUTPUT safe (needs to be HIGH at boot, pull-up LED)  |
+// +-------------+--------+-------------+------------------------------------------------------+
+
 // Base Configuration
 #define SERIAL_BEGIN 115200 // Baud rate for Serial Monitor
 
-#define LED_STATUS 5        // ONBOARD LED (Usually GPIO2 on NodeMCU, connected to onboard LED)
-#define LED_ERROR 16
+#define LED_STATUS 16        // ONBOARD LED (Usually GPIO2 on NodeMCU, connected to onboard LED)
+#define LED_ERROR 2      // ERROR LED (Usually GPIO4 on NodeMCU, connected to an external LED)
 
 #define SETTINGS_FILE_PATH "/settings.json" // File to store settings in LittleFS
 #define SETTINGS_FILE_DEFAULT_PATH "/settings_default.json" // Path to the settings file in LittleFS
@@ -35,16 +53,16 @@
 #define LOG_LEVEL 4  // 0=NONE, 1=ERROR, 2=WARN, 3=INFO, 4=DEBUG
 #define LOG_BUFFER_MAX_SIZE 4096  // Max log buffer size in chars (adjust as needed)
 
-// RFID Module Configuration
-#define RFID_RST_PIN 2      // D3 = GPIO0 (Reset pin for MFRC522)
+
+#define RFID_RST_PIN 0      // D3 = GPIO0 (Reset pin for MFRC522) 
 #define RFID_SPI_PIN 15     // D8 = GPIO15 (SPI Slave Select pin for MFRC522)
 #define RFID_SPI_DELAY 1000 // Delay after SPI bus initialization
 #define RFID_DELAY 500      // Delay after MFRC522 PCD_Init
 #define RFID_HISTORY_SIZE 10 // Number of last scanned RFID tags to keep in history
 
 // Servo Module Configuration
-#define DOOR_PIN 0        // Connect the servo's signal wire (usually yellow/orange) to this pin.
-#define DOOR_BTN_PIN 4 // Connect one leg of your push button to this pin.
+#define DOOR_PIN 4        // Connect the servo's signal wire (usually yellow/orange) to this pin.
+#define DOOR_BTN_PIN 5   // Connect one leg of your push button to this pin.
 #define DOOR_DEBOUNCE_DELAY 50 // Debounce delay for the button in milliseconds.
 
 #define DOOR_OPEN_ANGLE 180 // Example: Servo angle when the door is fully open.

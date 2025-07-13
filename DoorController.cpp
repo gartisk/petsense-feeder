@@ -141,7 +141,9 @@ void DoorController::toggle() {
         return; // Button not pressed
     }
 
-    if (!isDebounced(lastButtonPressTime, DOOR_DEBOUNCE_DELAY)) {
+    bool isCompletedDebounced = (millis() - lastButtonPressTime) > DOOR_DEBOUNCE_DELAY;
+    
+    if( !isCompletedDebounced ) {
         return; // Ignore if button press is not debounced
     }
 
