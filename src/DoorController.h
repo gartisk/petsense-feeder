@@ -16,7 +16,7 @@ public:
     static void process(); // Call this in loop()
     static void open();
     static void close();
-    static void open_close();
+    static void openWait();
     static void toggle();
     static DoorState get_state();
     // static bool isDebounced();
@@ -33,7 +33,7 @@ private:
     static unsigned long lastMoveTime;
     static int currentAngle;
 
-    // For open_close sequence
+    // For openWait sequence
     static unsigned long waitStartTime;
     static unsigned long waitTime;
     static bool waitingToClose;

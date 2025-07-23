@@ -14,10 +14,7 @@
 ESP8266WebServer server(SERVER_PORT);
 
 // Extern declarations to access global variables defined in catfeeder.ino
-// todo remove
-extern String lastScannedRfidUID;
-
-const char* root_path = "/";
+const char* root_path = "/web";
 
 
 // Determines the content type of a file based on its extension.

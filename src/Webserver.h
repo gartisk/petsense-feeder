@@ -11,9 +11,6 @@
 // This tells the compiler that 'server' is defined elsewhere (in webserver_handlers.cpp)
 extern ESP8266WebServer server;
 
-// Declare the global variable for the last scanned RFID UID as 'extern'
-// This variable is defined in catfeeder.ino and updated/read by multiple modules.
-extern String lastScannedRfidUID;
 
 // Function declarations for web server-related operations
 String getContentType(String filename);

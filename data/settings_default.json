@@ -16,11 +16,6 @@
             "ID": "EE:E7:C1:01",
             "NAME": "Clone",
             "ALLOWED": "true"
-        },
-        {
-            "ID": "AB:99:F1:02",
-            "NAME": "Pantera",
-            "ALLOWED": "false"
         }
     ]
 }

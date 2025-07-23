@@ -2,73 +2,73 @@
 #include "SettingsManager.h"
 #include "Log.h"
 #include "Useful.h"
+#include "LocalTime.h" // Handles local time functionalities
 
 #include "Webserver.h" // Handles all web server functionalities
 #include "RFIDManager.h"
 #include "DoorController.h"
 #include "LedBlinker.h" // Handles LED blinking functionalities
 
-String lastScannedRfidUID = "No scan yet"; // Stores the last scanned RFID UID for web display
-
 
 void setup() {
   Serial.begin(SERIAL_BEGIN); // Initialize serial communication
-  LOG_INFO("Pet Feeder - Setup Started");
+  LOG_INFO("Pet Feeder - Setup");
 
   // Initialize LittleFS filesystem
-  LOG_INFO("Settings Manager - Initializing");
+  LOG_INFO("Initializing Settings Manager...");
   SettingsManager::begin(); 
   SettingsManager::load(); 
 
   // Initialize LEDs
-  LOG_INFO("LEDs - Initializing");
+  LOG_INFO("Initializing LEDs...");
   GreenBlinker::begin(LED_STATUS); // or your green LED pin
   RedBlinker::begin(LED_ERROR);    // or your red LED pin
 
-  // Initialize the LED status
-  LED_MSG_START();
-
   // Initialize the RFID module
-  LOG_INFO("RFID Module - Initializing");
+  LOG_INFO("Initializing RFID Module...");
   setup_rfid_module();
 
   // Initialize Wi-Fi and setup the web server
-  LOG_INFO("Web Server - Initializing");
+  LOG_INFO("Initializing Web Server...");
   setup_webserver();
 
+  LOG_INFO("Initializing Local Time...");
+  timeSetup(); // Initialize local time
+
   // Initialize the door controller
-  LOG_INFO("Door Controller - Initializing");
+  LOG_INFO("Initializing Door Controller...");
   DoorController::begin();
+
+  // App Initialized
+  LOG_INFO("Pet Feeder Initilization Completed!");
+  LED_MSG_START();
 }
 
 void scan_id(){
   // Continuously scan for RFID tags
   String rfidUid = scan_rfid_card(); // Scan for RFID card and get UID
 
-  // nothing scanned
+  // If no RFID UID is scanned, exit the function
   if ( rfidUid.length() < 1 ) {
     return;
   }
 
-  LED_MSG_RFID_READ(); // Reading card, indicate with LED
-  //ledStatus(1, 100); // Indicate scanning with LED
+  LOG_INFO("RFID UID Scanned: " + rfidUid);
+  LED_MSG_RFID_READ();
 
+  // RFID is not allowed
   if ( !isAllowedRFID(rfidUid) ) { 
     LED_ERROR_RFID_INVALID();
     LOG_ERROR("RFIDManager", __FUNCTION__, "RFID not allowed: " + rfidUid);
     
-    lastScannedRfidUID = "Not allowed: " + rfidUid; // Update last scanned RFID UID
-
-    return; // Exit if RFID is not allowed
+    // Close the door if it is open
+    DoorController::close();
+    return;
   }
 
-  // Indicate allowed RFID with LED
+  // RFID is allowed
   LED_MSG_RFID_ALLOWED(); 
-
-  LOG_INFO("RFID allowed: " + rfidUid);
-  lastScannedRfidUID = "Allowed: " + rfidUid; // Update last scanned RFID UID
-  
-  DoorController::open_close();                // If a valid RFID UID is scanned, open the door
+  DoorController::openWait();
 }
 
 void loop() {

@@ -53,6 +53,10 @@
 #define LOG_LEVEL 4  // 0=NONE, 1=ERROR, 2=WARN, 3=INFO, 4=DEBUG
 #define LOG_BUFFER_MAX_SIZE 4096  // Max log buffer size in chars (adjust as needed)
 
+#define NTP_SERVER_ADDRESS "pool.ntp.org" // NTP server address
+#define NTP_TIMEZONE_UTC 0 // Timezone offset in hours (0 for UTC, adjust as needed)
+#define NTP_SERVER_ADDRESS_ALT "time.nist.gov" // Alternative NTP server address
+#define NTP_TIMEZONE_OFFSET 3600 // Timezone offset in seconds (e.g., 3600 for CET)
 
 #define RFID_RST_PIN 0      // D3 = GPIO0 (Reset pin for MFRC522) 
 #define RFID_SPI_PIN 15     // D8 = GPIO15 (SPI Slave Select pin for MFRC522)

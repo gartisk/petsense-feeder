@@ -1,14 +1,16 @@
 #include "DoorController.h"
 
 Servo DoorController::door_servo;
+
 DoorState DoorController::door_state = DOOR_CLOSED;
 unsigned long DoorController::lastButtonPressTime = 0;
-
-int DoorController::targetAngle = 0;
 int DoorController::moveStep = 5;
 int DoorController::moveInterval = 20;
-unsigned long DoorController::lastMoveTime = 0;
+
+int DoorController::targetAngle = 0;
 int DoorController::currentAngle = 0;
+
+unsigned long DoorController::lastMoveTime = 0;
 
 unsigned long DoorController::waitStartTime = 0;
 unsigned long DoorController::waitTime = 0;
@@ -123,7 +125,7 @@ void DoorController::close() {
     LOG_INFO("Door Closing - Angle " + String(targetAngle) + " Speed " + String(closeSpeed) + " MoveInterval " + String(moveInterval) + " (non-blocking)...");
 }
 
-void DoorController::open_close() {
+void DoorController::openWait() {
     open();
     JsonObject settings = SettingsManager::cached_settings.as<JsonObject>();
     waitTime = settings["DOOR_CLOSE_WAIT"] != "" ? settings["DOOR_CLOSE_WAIT"] : DOOR_CLOSE_WAIT; // Default to 10 seconds if not set
@@ -131,21 +133,22 @@ void DoorController::open_close() {
     lastMoveTime = millis();
     waitingToClose = true;
     // The rest is handled in process()
-    LOG_INFO("Door open_close sequence started (non-blocking)...");
+    LOG_INFO("Door openWait sequence started (non-blocking)...");
 }
 
 void DoorController::toggle() {
     int buttonState = digitalRead(DOOR_BTN_PIN);
+    
 
     if (buttonState != LOW ) {
         return; // Button not pressed
     }
 
-    bool isCompletedDebounced = (millis() - lastButtonPressTime) > DOOR_DEBOUNCE_DELAY;
+    // bool isCompletedDebounced = (millis() - lastButtonPressTime) > DOOR_DEBOUNCE_DELAY;
     
-    if( !isCompletedDebounced ) {
-        return; // Ignore if button press is not debounced
-    }
+    // if( !isCompletedDebounced ) {
+    //     return; // Ignore if button press is not debounced
+    // }
 
     // refresh last button press time
     // This is to prevent multiple toggles from a single press
@@ -153,6 +156,7 @@ void DoorController::toggle() {
     
     if (door_state == DOOR_CLOSED) {
         LOG_INFO("Button pressed: Door is currently closed. Opening door.");
+        waitingToClose = false; // Reset waiting to close state
         open();
     } else if (door_state == DOOR_OPEN) {
         LOG_INFO("Button pressed: Door is currently open. Closing door.");
@@ -160,6 +164,9 @@ void DoorController::toggle() {
     }
     
 }
+
+
+
 
 DoorState DoorController::get_state() {
     return door_state;

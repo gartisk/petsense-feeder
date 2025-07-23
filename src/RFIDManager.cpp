@@ -5,10 +5,9 @@
 #include <MFRC522.h>
 #include "config.h"
 #include "Useful.h"
-// Define the MFRC522 instance here. It must only be defined once.
 
-// RFID_SPI_PIN and RFID_RST_PIN are defined in config.h
 MFRC522 mfrc522(RFID_SPI_PIN, RFID_RST_PIN);
+
 const size_t MAX_RFID_HISTORY = RFID_HISTORY_SIZE;
 std::deque<RFIDEntry> lastRFIDs;
 
@@ -28,10 +27,11 @@ void addRFIDToHistory(const RFIDEntry& entry) {
     }
 }
 
+
 void setup_rfid_module() {
     // Initialize SPI bus
-    SPI.begin();       
-    delay(RFID_SPI_DELAY);  
+    SPI.begin();
+    delay(RFID_SPI_DELAY);
 
     // Initialize MFRC522 PCD
     mfrc522.PCD_Init();
