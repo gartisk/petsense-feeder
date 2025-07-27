@@ -12,7 +12,9 @@
     - [LittleFS Plugin](https://github.com/earlephilhower/arduino-littlefs-upload/)
 
 
-## Platform.io Configuration
+## Development
+
+### Server - Platform.io Configuration
 
 ```sh
     sudo apt update
@@ -27,9 +29,9 @@
 ```
 
 
-## Recommended Plugins
+#### Recommended Plugins
 
-### 🛠️ Installing LittleFS Plugin
+##### 🛠️ Installing LittleFS Plugin
 
 To install the LittleFS plugin, use one of the following commands:
 
@@ -44,7 +46,7 @@ curl -LO https://github.com/earlephilhower/arduino-littlefs-upload/releases/down
 mv arduino-littlefs-upload-1.5.4.vsix ~/.arduino15/plugins/
 ```
 
-### 🛠️ Installing Exception Decoder
+##### 🛠️ Installing Exception Decoder
 ```sh
 # Using wget 🐧
 wget https://github.com/dankeboy36/esp-exception-decoder/releases/download/1.1.0/esp-exception-decoder-1.1.0.vsix
@@ -56,6 +58,13 @@ curl -LO https://github.com/dankeboy36/esp-exception-decoder/releases/download/1
 mv esp-exception-decoder-1.1.0.vsix ~/.arduino15/plugins/
 ```
 
+## Web - Svelte / Vite Configuratiion
+
+Create /web/.env file with this content:
+
+```env
+    VITE_API_TARGET=http://YOUR-ESP-ADDRESS
+```
 
 ## App Config
 
@@ -88,10 +97,7 @@ mv esp-exception-decoder-1.1.0.vsix ~/.arduino15/plugins/
 - _(More pawsome features coming soon!)_ 🐕🐈
 
 
-## 🖼️ App Demo
+## 🐾 In Memory
 
-![Petsense Feeder Web Interface Demo](docs/demo.png)
-
-*Screenshot of the Petsense Feeder web interface, showing the dashboard for servo configuration, RFID tag registration, and system logs, accessible via WiFi from any device.*
-
-
+This project is dedicated to the loving memory of my family pet **Clone**.  
+Forever in the heart of my family and always inspiring every line of code. 🐈‍⬛❤️
