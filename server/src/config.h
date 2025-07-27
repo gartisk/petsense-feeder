@@ -39,24 +39,42 @@
 // | Red LED     | GPIO2  | D4          | OUTPUT safe (needs to be HIGH at boot, pull-up LED)  |
 // +-------------+--------+-------------+------------------------------------------------------+
 
-// Base Configuration
-#define SERIAL_BEGIN 115200 // Baud rate for Serial Monitor
+// PROJECT CONFIGURATION
+////////////////////////////////////
 
-#define LED_STATUS 16        // ONBOARD LED (Usually GPIO2 on NodeMCU, connected to onboard LED)
-#define LED_ERROR 2      // ERROR LED (Usually GPIO4 on NodeMCU, connected to an external LED)
+#define SERIAL_BEGIN 115200             // Baud rate for Serial Monitor
+#define LOG_LEVEL 4                     // 0=NONE, 1=ERROR, 2=WARN, 3=INFO, 4=DEBUG
+#define LOG_BUFFER_MAX_SIZE 4096        // Max log buffer size in chars (adjust as needed)
+
+
+// RESOURCES PINS CONFIGURATION
+////////////////////////////////////
+
+#define LED_STATUS_PIN 16    // ONBOARD LED (Usually GPIO2 on NodeMCU, connected to onboard LED)
+#define LED_ERROR_PIN 2      // ERROR LED (Usually GPIO4 on NodeMCU, connected to an external LED)
+
+#define DOOR_SERVO_PIN 4     // Connect the servo's signal wire (usually yellow/orange) to this pin.
+#define DOOR_BTN_PIN 5       // Connect one leg of your push button to this pin.
+
+
+// CUSTOMIZABLE SETTINGS
+////////////////////////////////////
 
 #define SETTINGS_FILE_PATH "/settings.json" // File to store settings in LittleFS
 #define SETTINGS_FILE_DEFAULT_PATH "/settings_default.json" // Path to the settings file in LittleFS
 #define SETTINGS_FILE_SIZE 2048 // Size of the settings file in bytes (adjust as needed)
 
-// Logging Configuration
-#define LOG_LEVEL 4  // 0=NONE, 1=ERROR, 2=WARN, 3=INFO, 4=DEBUG
-#define LOG_BUFFER_MAX_SIZE 4096  // Max log buffer size in chars (adjust as needed)
 
+// NTP Configuration
+////////////////////////////////////
 #define NTP_SERVER_ADDRESS "pool.ntp.org" // NTP server address
 #define NTP_TIMEZONE_UTC 0 // Timezone offset in hours (0 for UTC, adjust as needed)
 #define NTP_SERVER_ADDRESS_ALT "time.nist.gov" // Alternative NTP server address
 #define NTP_TIMEZONE_OFFSET 3600 // Timezone offset in seconds (e.g., 3600 for CET)
+
+
+// RFID522 Configuration
+////////////////////////////////////
 
 #define RFID_RST_PIN 0      // D3 = GPIO0 (Reset pin for MFRC522) 
 #define RFID_SPI_PIN 15     // D8 = GPIO15 (SPI Slave Select pin for MFRC522)
@@ -64,10 +82,11 @@
 #define RFID_DELAY 500      // Delay after MFRC522 PCD_Init
 #define RFID_HISTORY_SIZE 10 // Number of last scanned RFID tags to keep in history
 
+
 // Servo Module Configuration
-#define DOOR_PIN 4        // Connect the servo's signal wire (usually yellow/orange) to this pin.
-#define DOOR_BTN_PIN 5   // Connect one leg of your push button to this pin.
-#define DOOR_DEBOUNCE_DELAY 50 // Debounce delay for the button in milliseconds.
+////////////////////////////////////
+
+#define DOOR_DEBOUNCE_DELAY 500 // Debounce delay for the button in milliseconds.
 
 #define DOOR_OPEN_ANGLE 180 // Example: Servo angle when the door is fully open.
 #define DOOR_OPEN_SPEED 50 // Example: Speed of the door opening (in degrees per second).
@@ -77,7 +96,10 @@
 #define DOOR_CLOSE_WAIT 10000 // Example: Time to wait before closing the door after opening (in milliseconds).
 #define DOOR_DELAYER_DIVISOR 1000 // Example: Divisor for the delay between servo movements (in milliseconds).
 
+
 // WEB SERVER
+////////////////////////////////////
+
 #define WIFI_SETUP_RETRY_DELAY 1000
 #define SERVER_PORT 80
 #define SERVER_PAGE_MAIN "index.html"
@@ -87,11 +109,9 @@
   }
 
 
-// Function declaration only (definition must be in a .cpp file)
-// void startLedBlink(int ledPin, int blinkingTimes, int ledDelay);
-// void updateLedBlink();
+// LED MESSAGES
+////////////////////////////////////
 
-// Example LED message macros (no semicolon at end)
 #define LED_MSG_START()           GreenBlinker::start(5, 100)
 
 #define LED_MSG_DOOR_OPEN()       GreenBlinker::start(1, 100)
@@ -99,6 +119,10 @@
 
 #define LED_MSG_RFID_READ()       GreenBlinker::start(1, 100)
 #define LED_MSG_RFID_ALLOWED()    GreenBlinker::start(2, 100)
+
+
+// LED ERROR MESSAGES
+////////////////////////////////////
 
 #define LED_ERROR_RFID_INVALID()  RedBlinker::start(2, 200)
 #define LED_ERROR_RFID_DEVICE_NOT_FOUND() RedBlinker::start(3, 200)

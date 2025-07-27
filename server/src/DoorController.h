@@ -22,8 +22,8 @@ public:
     // static bool isDebounced();
 
 private:
-    static Servo door_servo;
-    static DoorState door_state;
+    static Servo servo;
+    static DoorState state;
     static unsigned long lastButtonPressTime;
 
     // For non-blocking movement

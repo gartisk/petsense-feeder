@@ -9,6 +9,15 @@
 #include "DoorController.h"
 #include "LedBlinker.h" // Handles LED blinking functionalities
 
+// Button debouncing variables
+unsigned long lastButtonPress = 0;
+int lastButtonState = HIGH;
+int currentButtonState = HIGH;
+
+// Time sync variables
+unsigned long lastTimeSync = 0;
+const unsigned long TIME_SYNC_INTERVAL = 3600000; // Sync every hour (3600000ms)
+
 
 void setup() {
   Serial.begin(SERIAL_BEGIN); // Initialize serial communication
@@ -21,8 +30,8 @@ void setup() {
 
   // Initialize LEDs
   LOG_INFO("Initializing LEDs...");
-  GreenBlinker::begin(LED_STATUS); // or your green LED pin
-  RedBlinker::begin(LED_ERROR);    // or your red LED pin
+  GreenBlinker::begin(LED_STATUS_PIN); // or your green LED pin
+  RedBlinker::begin(LED_ERROR_PIN);    // or your red LED pin
 
   // Initialize the RFID module
   LOG_INFO("Initializing RFID Module...");
@@ -34,10 +43,15 @@ void setup() {
 
   LOG_INFO("Initializing Local Time...");
   timeSetup(); // Initialize local time
+  LOG_INFO(String("Current Local Time: ") + getLocalTime()); // get the current local time
 
   // Initialize the door controller
   LOG_INFO("Initializing Door Controller...");
   DoorController::begin();
+
+  // Initialize the door button
+  LOG_INFO("Initializing Door Button...");
+  pinMode(DOOR_BTN_PIN, INPUT_PULLUP);
 
   // App Initialized
   LOG_INFO("Pet Feeder Initilization Completed!");
@@ -71,17 +85,61 @@ void scan_id(){
   DoorController::openWait();
 }
 
+void scan_btn(){
+    // Read the current button state
+    currentButtonState = digitalRead(DOOR_BTN_PIN);
+    
+    // this avoid opening and closing sequentially without unpressing the button
+    if (currentButtonState == lastButtonState) {
+      return; // Exit if the button state has not changed
+    }
+
+    lastButtonState = currentButtonState;
+    
+    unsigned long currentTime = millis();
+    bool isBtnDebounced = currentTime - lastButtonPress >= DOOR_DEBOUNCE_DELAY;
+    
+    // Button Debouncing check
+    if (!isBtnDebounced) {
+        return;
+    }
+
+    DoorController::toggle();
+    lastButtonPress = currentTime;
+}
+
+void updateTimeSync() {
+    unsigned long currentTime = millis();
+    
+    // Check if it's time to sync (every hour)
+    if (currentTime - lastTimeSync >= TIME_SYNC_INTERVAL) {
+        LOG_INFO("Syncing time with NTP server...");
+        
+        // Force NTP sync
+        configTime(NTP_TIMEZONE_UTC * NTP_TIMEZONE_OFFSET, 0, NTP_SERVER_ADDRESS, NTP_SERVER_ADDRESS_ALT);
+        
+        // Wait a bit for sync to complete
+        delay(100);
+        
+        LOG_INFO(String("Time synced - Current Local Time: ") + getLocalTime());
+        lastTimeSync = currentTime;
+    }
+}
+
 void loop() {
-  scan_id(); // Call the function to scan for RFID tags
+  // Call the function to scan for RFID tags
+  scan_id(); 
   
   // Handle incoming HTTP requests for the web server
-  server.handleClient(); // Process incoming HTTP requests for the web server
+  // Process incoming HTTP requests for the web server
+  server.handleClient(); 
   
   GreenBlinker::update();
   RedBlinker::update();
 
   DoorController::process();
-  DoorController::toggle();
+  scan_btn(); // Check if the door button is pressed
   
-  //updateLedBlink(); 
+  // Update time sync periodically
+  updateTimeSync();
 }

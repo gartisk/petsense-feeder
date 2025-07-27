@@ -1,6 +1,8 @@
 # TODO List
 
 ## Core Functionality
+- [ ] Configure Timezone and Clock
+ - [ ] Log Every RFID Access in a Day
 - [ ] Reorganize all files classes and methods
 - [ ] Access Point for Initial Configuration
 - [ ] Implentation MQTT
@@ -8,7 +10,7 @@
 - [ ] Led Success/Error indicating
 
 ## Web Panel (UI)
-- [ ] Complete Svelte UI migration for the web panel
+- [x] Complete Svelte UI migration for the web panel
 - [ ] Add multi-language support to web UI
 - [ ] Add user authentication to web panel
 - [ ] Polish DaisyUI theme and responsiveness

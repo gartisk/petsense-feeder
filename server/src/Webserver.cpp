@@ -148,8 +148,8 @@ void handleLastRFIDs() {
 
 void handleToggleDoor() {
   LOG_INFO("Toggle Door Request Received");
-  
-  if (DoorController::get_state() == DOOR_CLOSED) {
+
+  if (DoorController::get_state() == DoorState::DOOR_CLOSED) {
     DoorController::open(); // Open the door if it's currently closed
     server.send(200, "application/json", "{\"status\":\"success\", \"message\":\"Opening the Door\", \"door_state\": \"open\"}");
     return;
